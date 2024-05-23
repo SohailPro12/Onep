@@ -4,17 +4,41 @@
  */
 package onepproject;
 
-/**
- *
- * @author PC
- */
-public class OnepProject {
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-    /**
-     * @param args the command line arguments
-     */
+public class OnepProject {
     public static void main(String[] args) {
-        // TODO code application logic here
+        // Create the main frame
+        JFrame mainFrame = new JFrame("Main Form");
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setSize(300, 150);
+        mainFrame.setLayout(new GridLayout(2, 1));
+        
+        // Create the buttons
+        JButton adminButton = new JButton("Admin Login");
+        JButton userButton = new JButton("User Login");
+        
+        // Add action listeners to the buttons
+        adminButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                AdminLoginForm.showAdminLoginForm();
+            }
+        });
+        
+        userButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                UserLoginForm.showUserLoginForm();
+            }
+        });
+        
+        // Add buttons to the frame
+        mainFrame.add(adminButton);
+        mainFrame.add(userButton);
+        
+        // Set frame to be visible
+        mainFrame.setVisible(true);
     }
-    
 }
