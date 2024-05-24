@@ -2,6 +2,8 @@ package onepproject;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class AdminLoginForm {
     public static void showAdminLoginForm(JFrame parentFrame) {
@@ -12,17 +14,19 @@ public class AdminLoginForm {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         adminFrame.add(new JLabel("Admin Username:"), gbc);
 
         gbc.gridx = 1;
         JTextField adminUsername = new JTextField(15);
         adminFrame.add(adminUsername, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         adminFrame.add(new JLabel("Admin Password:"), gbc);
-        
+
         gbc.gridx = 1;
         JPasswordField adminPassword = new JPasswordField(15);
         adminFrame.add(adminPassword, gbc);
@@ -38,6 +42,16 @@ public class AdminLoginForm {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 parentFrame.setVisible(true);
+            }
+        });
+
+        // Add action listener to login button
+        adminLoginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // For simplicity, we skip authentication checks here
+                adminFrame.dispose();
+                AdminDashboard.showAdminDashboard(parentFrame);
             }
         });
     }
