@@ -1,31 +1,46 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package onepproject;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class UserLoginForm {
-    public static void showUserLoginForm() {
+    public static void showUserLoginForm(JFrame parentFrame) {
         JFrame userFrame = new JFrame("User Login");
         userFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        userFrame.setSize(300, 200);
-        userFrame.setLayout(new GridLayout(3, 2));
-        
-        // Add components for user login
-        userFrame.add(new JLabel("User Username:"));
-        JTextField userUsername = new JTextField();
-        userFrame.add(userUsername);
-        
-        userFrame.add(new JLabel("User Password:"));
-        JPasswordField userPassword = new JPasswordField();
-        userFrame.add(userPassword);
-        
+        userFrame.setSize(400, 200);
+        userFrame.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        userFrame.add(new JLabel("User Username:"), gbc);
+
+        gbc.gridx = 1;
+        JTextField userUsername = new JTextField(15);
+        userFrame.add(userUsername, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        userFrame.add(new JLabel("User Password:"), gbc);
+
+        gbc.gridx = 1;
+        JPasswordField userPassword = new JPasswordField(15);
+        userFrame.add(userPassword, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
         JButton userLoginButton = new JButton("Login");
-        userFrame.add(userLoginButton);
-        
+        userFrame.add(userLoginButton, gbc);
+
         userFrame.setVisible(true);
+
+        userFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                parentFrame.setVisible(true);
+            }
+        });
     }
 }

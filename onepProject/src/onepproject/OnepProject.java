@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package onepproject;
 
 import javax.swing.*;
@@ -14,31 +10,50 @@ public class OnepProject {
         // Create the main frame
         JFrame mainFrame = new JFrame("Main Form");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(300, 150);
-        mainFrame.setLayout(new GridLayout(2, 1));
-        
-        // Create the buttons
+        mainFrame.setSize(400, 200);
+        mainFrame.setLayout(new BorderLayout());
+
+        // Create a panel with CardLayout
+        JPanel cardPanel = new JPanel(new CardLayout());
+
+        // Create the main panel with buttons
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
         JButton adminButton = new JButton("Admin Login");
         JButton userButton = new JButton("User Login");
-        
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        mainPanel.add(adminButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        mainPanel.add(userButton, gbc);
+
+        // Add the main panel to the card panel
+        cardPanel.add(mainPanel, "MainPanel");
+
+        // Add the card panel to the main frame
+        mainFrame.add(cardPanel, BorderLayout.CENTER);
+
+        // Set frame to be visible
+        mainFrame.setVisible(true);
+
         // Add action listeners to the buttons
         adminButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                AdminLoginForm.showAdminLoginForm();
+                mainFrame.setVisible(false);
+                AdminLoginForm.showAdminLoginForm(mainFrame);
             }
         });
-        
+
         userButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                UserLoginForm.showUserLoginForm();
+                mainFrame.setVisible(false);
+                UserLoginForm.showUserLoginForm(mainFrame);
             }
         });
-        
-        // Add buttons to the frame
-        mainFrame.add(adminButton);
-        mainFrame.add(userButton);
-        
-        // Set frame to be visible
-        mainFrame.setVisible(true);
     }
 }

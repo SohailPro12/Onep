@@ -1,31 +1,44 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package onepproject;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class AdminLoginForm {
-    public static void showAdminLoginForm() {
+    public static void showAdminLoginForm(JFrame parentFrame) {
         JFrame adminFrame = new JFrame("Admin Login");
         adminFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        adminFrame.setSize(300, 200);
-        adminFrame.setLayout(new GridLayout(3, 2));
+        adminFrame.setSize(400, 200);
+        adminFrame.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
         
-        // Add components for admin login
-        adminFrame.add(new JLabel("Admin Username:"));
-        JTextField adminUsername = new JTextField();
-        adminFrame.add(adminUsername);
+        adminFrame.add(new JLabel("Admin Username:"), gbc);
+
+        gbc.gridx = 1;
+        JTextField adminUsername = new JTextField(15);
+        adminFrame.add(adminUsername, gbc);
         
-        adminFrame.add(new JLabel("Admin Password:"));
-        JPasswordField adminPassword = new JPasswordField();
-        adminFrame.add(adminPassword);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        adminFrame.add(new JLabel("Admin Password:"), gbc);
         
+        gbc.gridx = 1;
+        JPasswordField adminPassword = new JPasswordField(15);
+        adminFrame.add(adminPassword, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
         JButton adminLoginButton = new JButton("Login");
-        adminFrame.add(adminLoginButton);
-        
+        adminFrame.add(adminLoginButton, gbc);
+
         adminFrame.setVisible(true);
+
+        adminFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                parentFrame.setVisible(true);
+            }
+        });
     }
 }
