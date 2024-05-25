@@ -1,5 +1,3 @@
-package onepproject;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,61 +14,85 @@ public class CreateAccountForm extends JDialog {
         super(parentFrame, "Create Account", true);
         setSize(400, 300);
         setLocationRelativeTo(parentFrame);
-        setLayout(new GridLayout(6, 2, 10, 10));
+        setLayout(new BorderLayout(10, 10)); // Utilisation d'un layout border pour une meilleure organisation
 
-        // Create and add form fields
-        add(new JLabel("Login:"));
+        JPanel formPanel = new JPanel(new GridLayout(5, 2, 5, 5)); // Panel pour les champs de formulaire
+        add(formPanel, BorderLayout.CENTER);
+
+        // Labels et champs de formulaire
+        formPanel.add(new JLabel("Nom d'utilisateur:"));
         loginField = new JTextField();
-        add(loginField);
+        formPanel.add(loginField);
 
-        add(new JLabel("Password:"));
+        formPanel.add(new JLabel("Mot de passe:"));
         passwordField = new JPasswordField();
-        add(passwordField);
+        formPanel.add(passwordField);
 
-        add(new JLabel("Full Name:"));
+        formPanel.add(new JLabel("Nom complet:"));
         fullNameField = new JTextField();
-        add(fullNameField);
+        formPanel.add(fullNameField);
 
-        add(new JLabel("Position:"));
+        formPanel.add(new JLabel("Poste:"));
         positionField = new JTextField();
-        add(positionField);
+        formPanel.add(positionField);
 
-        add(new JLabel("Department:"));
+        formPanel.add(new JLabel("Département:"));
         departmentField = new JTextField();
-        add(departmentField);
+        formPanel.add(departmentField);
 
-        // Add buttons
-        JButton createButton = new JButton("Create");
-        JButton cancelButton = new JButton("Cancel");
+        // Boutons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        JButton createButton = new JButton("Créer");
+        JButton cancelButton = new JButton("Annuler");
 
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Implement the logic to create an account
+                // Implémenter la logique pour créer un compte
                 String login = loginField.getText();
                 String password = new String(passwordField.getPassword());
                 String fullName = fullNameField.getText();
                 String position = positionField.getText();
                 String department = departmentField.getText();
 
-                // For now, we'll just show the entered data in a dialog
+                // Afficher les données saisies dans un dialogue
                 JOptionPane.showMessageDialog(CreateAccountForm.this,
-                        "Login: " + login + "\nPassword: " + password + "\nFull Name: " + fullName +
-                                "\nPosition: " + position + "\nDepartment: " + department,
-                        "Account Created", JOptionPane.INFORMATION_MESSAGE);
-                
-                dispose(); // Close the form
+                        "Nom d'utilisateur: " + login + "\nMot de passe: " + password + "\nNom complet: " + fullName +
+                                "\nPoste: " + position + "\nDépartement: " + department,
+                        "Compte créé", JOptionPane.INFORMATION_MESSAGE);
+
+                dispose(); // Fermer le formulaire
             }
         });
 
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dispose(); // Close the form without creating an account
+                dispose(); // Fermer le formulaire sans créer de compte
             }
         });
 
-        add(createButton);
-        add(cancelButton);
+        buttonPanel.add(createButton);
+        buttonPanel.add(cancelButton);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Test");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(600, 400);
+            frame.setLocationRelativeTo(null);
+
+            JButton openButton = new JButton("Ouvrir le formulaire");
+            openButton.addActionListener(e -> {
+                CreateAccountForm form = new CreateAccountForm(frame);
+                form.setVisible(true);
+            });
+
+            frame.add(openButton);
+            frame.setVisible(true);
+        });
     }
 }
