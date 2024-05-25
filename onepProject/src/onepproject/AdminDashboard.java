@@ -4,46 +4,42 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
+import java.util.Vector;
 
 public class AdminDashboard {
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/onep_db";
+    private static final String DB_USERNAME = "root";
+    private static final String DB_PASSWORD = ""; // Change to your actual DB password
+
     public static void showAdminDashboard(JFrame parentFrame) {
         JFrame adminDashboardFrame = new JFrame("Admin Dashboard");
         adminDashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        adminDashboardFrame.setSize(800, 400); // Ajuster la taille pour accueillir moins de colonnes
+        adminDashboardFrame.setSize(800, 400);
         adminDashboardFrame.setLayout(new BorderLayout());
 
-        // Ajouter le label du titre
         JLabel titleLabel = new JLabel("Demande de récupération", JLabel.CENTER);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 20));
         adminDashboardFrame.add(titleLabel, BorderLayout.NORTH);
 
-        // Mettre à jour le modèle de tableau avec de nouveaux noms de colonnes et données
-        String[] columnNames = {"Login", "Gmail", "Number"}; // Supprimer la colonne "Role"
-        Object[][] data = {
-            {"Alice", "alice@example.com", "123-456-7890"},
-            {"Bob", "bob@example.com", "234-567-8901"},
-            {"Charlie", "charlie@example.com", "345-678-9012"}
-        };
-        JTable table = new JTable(data, columnNames);
+        String[] columnNames = {"Login", "Gmail", "Number"};
+        Object[][] data = fetchDataFromDatabase();
 
-        // Personnaliser l'apparence du tableau
+        JTable table = new JTable(data, columnNames);
         table.setFillsViewportHeight(true);
         table.setRowHeight(30);
         table.setFont(new Font("SansSerif", Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
         table.getTableHeader().setBackground(Color.LIGHT_GRAY);
 
-        // Ajouter le tableau à un JScrollPane
         JScrollPane scrollPane = new JScrollPane(table);
         adminDashboardFrame.add(scrollPane, BorderLayout.CENTER);
 
-        // Créer un panel pour les boutons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JButton logoutButton = new JButton("Logout");
         JButton loginButton = new JButton("Login");
         JButton doneButton = new JButton("Done");
 
-        // Ajouter les écouteurs d'action pour les boutons
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -63,17 +59,14 @@ public class AdminDashboard {
         doneButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Implémenter l'action désirée pour le bouton "Done" ici
                 JOptionPane.showMessageDialog(adminDashboardFrame, "Done button clicked!");
             }
         });
 
-        // Ajouter les boutons au panel
         buttonPanel.add(logoutButton);
         buttonPanel.add(loginButton);
         buttonPanel.add(doneButton);
 
-        // Ajouter le panel de boutons en bas de la fenêtre
         adminDashboardFrame.add(buttonPanel, BorderLayout.SOUTH);
 
         adminDashboardFrame.setVisible(true);
@@ -84,5 +77,30 @@ public class AdminDashboard {
                 parentFrame.setVisible(true);
             }
         });
+    }
+
+    private static Object[][] fetchDataFromDatabase() {
+        Vector<Vector<Object>> dataVector = new Vector<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "SELECT login, email, numero_tel FROM recuperation_mp";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    Vector<Object> row = new Vector<>();
+                    row.add(rs.getString("login"));
+                    row.add(rs.getString("email"));
+                    row.add(rs.getString("numero_tel"));
+                    dataVector.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        Object[][] data = new Object[dataVector.size()][3];
+        for (int i = 0; i < dataVector.size(); i++) {
+            data[i] = dataVector.get(i).toArray();
+        }
+        return data;
     }
 }
