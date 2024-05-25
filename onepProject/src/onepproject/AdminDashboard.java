@@ -37,7 +37,7 @@ public class AdminDashboard {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JButton logoutButton = new JButton("Logout");
-        JButton loginButton = new JButton("Login");
+        JButton createAccountButton = new JButton("Create Account");
         JButton doneButton = new JButton("Done");
 
         logoutButton.addActionListener(new ActionListener() {
@@ -48,11 +48,10 @@ public class AdminDashboard {
             }
         });
 
-        loginButton.addActionListener(new ActionListener() {
+        createAccountButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                adminDashboardFrame.dispose();
-                AdminLoginForm.showAdminLoginForm(parentFrame);
+                new CreateAccountForm(adminDashboardFrame).setVisible(true);
             }
         });
 
@@ -64,7 +63,7 @@ public class AdminDashboard {
         });
 
         buttonPanel.add(logoutButton);
-        buttonPanel.add(loginButton);
+        buttonPanel.add(createAccountButton);
         buttonPanel.add(doneButton);
 
         adminDashboardFrame.add(buttonPanel, BorderLayout.SOUTH);
@@ -104,3 +103,4 @@ public class AdminDashboard {
         return data;
     }
 }
+

@@ -4,8 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.*;
 
 public class AdminLoginForm {
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/onep_db";
+    private static final String DB_USERNAME = "root";
+    private static final String DB_PASSWORD = ""; // Change to your actual DB password
+
     public static void showAdminLoginForm(JFrame parentFrame) {
         JFrame adminFrame = new JFrame("Admin Login");
         adminFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -49,10 +54,34 @@ public class AdminLoginForm {
         adminLoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // For simplicity, we skip authentication checks here
-                adminFrame.dispose();
-                AdminDashboard.showAdminDashboard(parentFrame);
+                String username = adminUsername.getText();
+                String password = new String(adminPassword.getPassword());
+
+                if (authenticateAdmin(username, password)) {
+                    adminFrame.dispose();
+                    AdminDashboard.showAdminDashboard(parentFrame);
+                } else {
+                    JOptionPane.showMessageDialog(adminFrame, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
+    }
+
+    private static boolean authenticateAdmin(String username, String password) {
+        boolean isAuthenticated = false;
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "SELECT * FROM admin WHERE login = ? AND pass = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                stmt.setString(2, password);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    isAuthenticated = true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isAuthenticated;
     }
 }
