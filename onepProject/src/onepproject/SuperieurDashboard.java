@@ -109,16 +109,15 @@ public class SuperieurDashboard {
         JButton searchButton = new JButton("Chercher");
         dashboardFrame.add(searchButton, gbc);
 
-        // Data grid view
         gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridheight = 10;
-        gbc.gridwidth = 3;
-        String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-        JTable taskTable = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(taskTable);
-        dashboardFrame.add(scrollPane, gbc);
+gbc.gridy = 0;
+gbc.gridheight = 10;
+gbc.gridwidth = 3;
+String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"}; // Add Comment and Progression columns
+DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+JTable taskTable = new JTable(tableModel);
+JScrollPane scrollPane = new JScrollPane(taskTable);
+dashboardFrame.add(scrollPane, gbc);
 
         // Other buttons
         gbc.gridx = 5;
@@ -227,7 +226,8 @@ public class SuperieurDashboard {
     departmentComboBox.setSelectedIndex(-1);  // Reset the department combo box
     agentComboBox.removeAllItems();  // Clear agent combo box
     budgetField.setText("");
-    supField.setText("");
+
+     taskIdField.setText(getNextTaskId());
 }
 
 
@@ -294,29 +294,33 @@ private static int getDepartmentId(String departmentName) {
         return nextId;
     }
 
-    private static void loadTasks(DefaultTableModel tableModel) {
-        tableModel.setRowCount(0); // Clear the table
-         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "SELECT id, Titre, Description, Agent, budget FROM tache";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    Object[] row = {
-                            rs.getInt("id"),
-                            rs.getString("Titre"),
-                            rs.getString("Description"),
-                            rs.getString("Agent"),
-                            rs.getInt("budget")
-                    };
-                    tableModel.addRow(row);
-                }
+   private static void loadTasks(DefaultTableModel tableModel) {
+    tableModel.setRowCount(0); // Clear the table
+    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+        String query = "SELECT t.id, Titre, t.Description, t.Agent, budget, c.Description as commentaires, c.progression FROM tache t, commentaires c where t.id = c.Id_Tache";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Object[] row = {
+                        rs.getInt("id"),
+                        rs.getString("Titre"),
+                        rs.getString("Description"),
+                        rs.getString("Agent"),
+                        rs.getInt("budget"),
+                        rs.getString("commentaires"), // Include Comment column
+                        rs.getString("Progression") // Include Progression column
+                };
+                tableModel.addRow(row);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+}
+
 
     private static void addTask(JTextField titleField, JTextField descriptionField, JComboBox<String> agentComboBox, JTextField budgetField, JTextField supField, DefaultTableModel tableModel, JTextField taskIdField) {
+        String id = taskIdField.getText();
         String title = titleField.getText();
         String description = descriptionField.getText();
         String agentName = (String) agentComboBox.getSelectedItem();
@@ -324,13 +328,22 @@ private static int getDepartmentId(String departmentName) {
         String sup = supField.getText();
 
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "INSERT INTO tache (Titre, Description, Agent, budget, sup) VALUES (?, ?, ?, ?, ?)";
+            String query = "INSERT INTO tache (id ,Titre, Description, Agent, budget, sup) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, title);
-                stmt.setString(2, description);
-                stmt.setString(3, agentName);
-                stmt.setString(4, budget);
-                stmt.setString(5, sup);
+                stmt.setString(1, id);
+                stmt.setString(2, title);
+                stmt.setString(3, description);
+                stmt.setString(4, agentName);
+                stmt.setString(5, budget);
+                stmt.setString(6, sup);
+                stmt.executeUpdate();
+            }
+            String query2 = "INSERT INTO commentaires (Description, Agent, Id_Tache,progression) VALUES (?, ?, ?,?)";
+            try (PreparedStatement stmt = conn.prepareStatement(query2)) {
+                stmt.setString(1, "");
+                stmt.setString(2, agentName);
+                stmt.setString(3, id);
+                stmt.setString(4, "");
                 stmt.executeUpdate();
             }
 
