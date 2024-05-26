@@ -514,7 +514,7 @@ private static int getDepartmentId(String departmentName) {
         JFreeChart barChart = ChartFactory.createBarChart(
                 "Task Progression",
                 "Task",
-                "Progression",
+                "Progression", 
                 dataset,
                 PlotOrientation.VERTICAL,
                 true, true, false);
