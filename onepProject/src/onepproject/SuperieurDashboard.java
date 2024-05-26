@@ -6,6 +6,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 public class SuperieurDashboard {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/onep_db";
@@ -183,7 +188,7 @@ dashboardFrame.add(scrollPane, gbc);
         logoutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dashboardFrame.dispose();
-                parentFrame.setVisible(true); // Show login form
+                parentFrame.setVisible(true);
             }
         });
 
@@ -193,16 +198,31 @@ dashboardFrame.add(scrollPane, gbc);
             }
         });
 
-        taskTable.getSelectionModel().addListSelectionListener(event -> {
-            if (!event.getValueIsAdjusting() && taskTable.getSelectedRow() != -1) {
-                int selectedRow = taskTable.getSelectedRow();
-                taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
-                titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
-                descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
-                agentComboBox.setSelectedItem(taskTable.getValueAt(selectedRow, 3).toString());
-                budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
-            }
-        });
+       taskTable.getSelectionModel().addListSelectionListener(event -> {
+    if (!event.getValueIsAdjusting() && taskTable.getSelectedRow() != -1) {
+        int selectedRow = taskTable.getSelectedRow();
+        taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
+        titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
+        descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
+        String agentName = taskTable.getValueAt(selectedRow, 3).toString();
+        budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
+
+        // Get department name based on agent name
+        String departmentName = getDepartmentNameByAgent(agentName);
+        departmentComboBox.setSelectedItem(departmentName);
+
+        // Load agents for the selected department and set the selected agent
+        loadAgents(departmentComboBox, agentComboBox);
+        agentComboBox.setSelectedItem(agentName);
+    }
+});
+
+departmentComboBox.addActionListener(e -> {
+    if (departmentComboBox.getSelectedItem() != null) {
+        loadAgents(departmentComboBox, agentComboBox);
+    }
+});
+
     }
 
     private static void loadDepartments(JComboBox<String> departmentComboBox) {
@@ -431,11 +451,25 @@ private static int getDepartmentId(String departmentName) {
             loadTasks(tableModel); // Reload all tasks if search bar is empty
         }
     }
-
-    private static void showStatistics() {
-        // Logic to show statistics
-        JOptionPane.showMessageDialog(null, "Statistics not implemented yet!");
+    private static String getDepartmentNameByAgent(String agentName) {
+    String departmentName = "";
+    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+        String query = "SELECT d.libelle FROM department d JOIN agent a ON d.id = a.Departement WHERE a.NomComplete = ? UNION SELECT d.libelle FROM department d JOIN superieur s ON d.id = s.Departement WHERE s.NomComplete = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, agentName);
+            stmt.setString(2, agentName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                departmentName = rs.getString("libelle");
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return departmentName;
+}
+
+
 
     private static String getSuperieurFullName(String username) {
         String fullName = "";
@@ -453,4 +487,43 @@ private static int getDepartmentId(String departmentName) {
         }
         return fullName;
     }
+
+ private static void showStatistics() {
+        JFrame statsFrame = new JFrame("Task Progression Statistics");
+        statsFrame.setSize(800, 600);
+        statsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        
+        // Retrieve data from the database
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "SELECT Titre, progression FROM tache t JOIN commentaires c ON t.id = c.Id_Tache";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String title = rs.getString("Titre");
+                    int progression = rs.getInt("progression");
+                    dataset.addValue(progression, "Progression", title);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Create the chart
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "Task Progression",
+                "Task",
+                "Progression",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, true, false);
+
+        ChartPanel chartPanel = new ChartPanel(barChart);
+        chartPanel.setPreferredSize(new Dimension(800, 600));
+        statsFrame.setContentPane(chartPanel);
+
+        statsFrame.setVisible(true);
+    }
+
 }
