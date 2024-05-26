@@ -517,7 +517,7 @@ private static int getDepartmentId(String departmentName) {
                 "Progression",
                 dataset,
                 PlotOrientation.VERTICAL,
-                true, true, false);
+                true, true, false); 
 
         ChartPanel chartPanel = new ChartPanel(barChart);
         chartPanel.setPreferredSize(new Dimension(800, 600));
