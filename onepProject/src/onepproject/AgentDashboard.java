@@ -1,86 +1,138 @@
 package onepproject;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 public class AgentDashboard extends JFrame {
-    private JTextField taskField;
-    private JTextArea taskDescriptionArea;
+    private JTextField taskNumberField;
+    private JTextField commentField;
+    private JComboBox<String> statusComboBox;
+    private JTable taskTable;
+    private DefaultTableModel model;
 
     public AgentDashboard(String username) {
-        setTitle("Agent Dashboard");
-        setSize(500, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setLayout(new BorderLayout(10, 10));
+        setTitle("Agent Dashboard - Welcome " + username);
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null); // Center the window
 
-        JLabel welcomeLabel = new JLabel("Welcome, " + username, SwingConstants.CENTER);
-        add(welcomeLabel, BorderLayout.NORTH);
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel formPanel = new JPanel(new GridLayout(3, 2, 5, 5));
-        add(formPanel, BorderLayout.CENTER);
+        // Panel for task modification
+        JPanel modificationPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        formPanel.add(new JLabel("Task:"));
-        taskField = new JTextField();
-        formPanel.add(taskField);
+        JLabel taskNumberLabel = new JLabel("Task Number:");
+        modificationPanel.add(taskNumberLabel, gbc);
 
-        formPanel.add(new JLabel("Task Description:"));
-        taskDescriptionArea = new JTextArea(5, 20);
-        formPanel.add(new JScrollPane(taskDescriptionArea));
+        gbc.gridx = 1;
+        taskNumberField = new JTextField(20);
+        modificationPanel.add(taskNumberField, gbc);
 
-        JButton submitButton = new JButton("Submit Task");
-        submitButton.addActionListener(new ActionListener() {
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        JLabel commentLabel = new JLabel("Comment:");
+        modificationPanel.add(commentLabel, gbc);
+
+        gbc.gridx = 1;
+        commentField = new JTextField(20);
+        modificationPanel.add(commentField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JLabel statusLabel = new JLabel("Status:");
+        modificationPanel.add(statusLabel, gbc);
+
+        gbc.gridx = 1;
+        String[] statusOptions = {"Pending", "In Progress", "Completed"};
+        statusComboBox = new JComboBox<>(statusOptions);
+        modificationPanel.add(statusComboBox, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        JButton modifyButton = new JButton("Modify");
+        modificationPanel.add(modifyButton, gbc);
+
+        modifyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String task = taskField.getText();
-                String taskDescription = taskDescriptionArea.getText();
+                // Implement modify task logic here
+                String taskNumber = taskNumberField.getText();
+                String comment = commentField.getText();
+                String status = (String) statusComboBox.getSelectedItem();
 
-                if (task.isEmpty() || taskDescription.isEmpty()) {
-                    JOptionPane.showMessageDialog(AgentDashboard.this,
-                            "Please fill in all fields.",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                } else {
-                    // Insert the task into the database
-                    insertTaskIntoDatabase(username, task, taskDescription);
+                // Update the task in the table based on taskNumber
+                boolean taskFound = false;
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    if (model.getValueAt(i, 0).equals(taskNumber)) {
+                        model.setValueAt(comment, i, 1); // Assuming comment goes to description column
+                        model.setValueAt(status, i, 2);  // Assuming status goes to assigned from superior column
+                        taskFound = true;
+                        break;
+                    }
+                }
+
+                if (!taskFound) {
+                    JOptionPane.showMessageDialog(AgentDashboard.this, 
+                        "Task Number not found!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        add(submitButton, BorderLayout.SOUTH);
-    }
+        // Panel for task display
+        JPanel taskPanel = new JPanel(new BorderLayout());
+        
+        // Title for the data grid view
+        JLabel taskTableTitle = new JLabel("Task List", JLabel.CENTER);
+        taskTableTitle.setFont(new Font("Arial", Font.BOLD, 18));
+        taskPanel.add(taskTableTitle, BorderLayout.NORTH);
+        
+        String[] columnNames = {"Task Number", "Task Description", "Status"};
+        Object[][] data = {
+                {"1", "Task 1 Description", "Pending"},
+                {"2", "Task 2 Description", "In Progress"}
+                // Add more rows as needed
+        };
+        model = new DefaultTableModel(data, columnNames);
+        taskTable = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(taskTable);
+        taskPanel.add(scrollPane, BorderLayout.CENTER);
 
-    private void insertTaskIntoDatabase(String username, String task, String taskDescription) {
-        String url = "jdbc:mysql://localhost:3306/onep_db";
-        String dbUsername = "root"; // Change to your database username
-        String dbPassword = ""; // Change to your database password
+        // Logout button
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                // Implement logout logic here
+                // For example, showing the login form
+                // or closing the application
+            }
+        });
 
-        String insertSQL = "INSERT INTO tasks (username, task, taskDescription) VALUES (?, ?, ?)";
+        // Adding titles and making the interface more professional
+        JLabel headerLabel = new JLabel("Agent Task Management Dashboard", JLabel.CENTER);
+        headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        mainPanel.add(headerLabel, BorderLayout.NORTH);
 
-        try (Connection conn = DriverManager.getConnection(url, dbUsername, dbPassword);
-             PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+        mainPanel.add(modificationPanel, BorderLayout.WEST);
+        mainPanel.add(taskPanel, BorderLayout.CENTER);
+        mainPanel.add(logoutButton, BorderLayout.SOUTH);
 
-            pstmt.setString(1, username);
-            pstmt.setString(2, task);
-            pstmt.setString(3, taskDescription);
-
-            pstmt.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Task submitted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-        }
+        getContentPane().add(mainPanel);
+        setVisible(true);
     }
 
     public static void showAgentDashboard(String username) {
-        SwingUtilities.invokeLater(() -> {
-            AgentDashboard agentDashboard = new AgentDashboard(username);
-            agentDashboard.setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new AgentDashboard(username));
     }
 }
