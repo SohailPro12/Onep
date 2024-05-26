@@ -104,7 +104,7 @@ public class UserLoginForm {
         if (role.equals("superieur")) {
             SuperieurDashboard.showSuperieurDashboard(new JFrame(), username);
         } else if (role.equals("agent")) {
-            showAgentDashboard();
+            AgentDashboard.showAgentDashboard(username);
         } else {
             JOptionPane.showMessageDialog(null, "Unknown user role. Please contact the administrator.");
         }
@@ -125,18 +125,6 @@ public class UserLoginForm {
             e.printStackTrace();
         }
         return "";
-    }
-
-    private static void showAgentDashboard() {
-        JFrame dashboardFrame = new JFrame("Agent Dashboard");
-        dashboardFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        dashboardFrame.setSize(400, 300);
-        dashboardFrame.setLayout(new BorderLayout());
-
-        JLabel welcomeLabel = new JLabel("Welcome to the Agent Dashboard", SwingConstants.CENTER);
-        dashboardFrame.add(welcomeLabel, BorderLayout.CENTER);
-
-        dashboardFrame.setVisible(true);
     }
 
     private static void showForgotPasswordForm(JFrame parentFrame) {
@@ -281,9 +269,8 @@ public class UserLoginForm {
                 String username = usernameField.getText();
                 String code = codeField.getText();
                 if (verifyRecoveryCode(username, code)) {
-                    messageLabel.setText("Code verified!");
-                    recoveryCodeFrame.dispose();
-                    showResetPasswordForm(parentFrame, username);
+                    messageLabel.setText("Code verified. You may now reset your password.");
+                    // Add code to show password reset form
                 } else {
                     messageLabel.setText("Invalid username or recovery code.");
                 }
@@ -306,101 +293,6 @@ public class UserLoginForm {
                 stmt.setString(2, code);
                 ResultSet rs = stmt.executeQuery();
                 return rs.next();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private static void showResetPasswordForm(JFrame parentFrame, String username) {
-        JFrame resetPasswordFrame = new JFrame("Reset Password");
-        resetPasswordFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        resetPasswordFrame.setSize(400, 300);
-        resetPasswordFrame.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        resetPasswordFrame.add(new JLabel("New Password:"), gbc);
-
-        gbc.gridx = 1;
-        JPasswordField newPasswordField = new JPasswordField(15);
-        resetPasswordFrame.add(newPasswordField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        resetPasswordFrame.add(new JLabel("Confirm Password:"), gbc);
-
-        gbc.gridx = 1;
-        JPasswordField confirmPasswordField = new JPasswordField(15);
-        resetPasswordFrame.add(confirmPasswordField, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        JButton resetButton = new JButton("Reset");
-        resetPasswordFrame.add(resetButton, gbc);
-
-        JLabel messageLabel = new JLabel("");
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        resetPasswordFrame.add(messageLabel, gbc);
-
-        resetPasswordFrame.setVisible(true);
-
-        resetButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String newPassword = new String(newPasswordField.getPassword());
-                String confirmPassword = new String(confirmPasswordField.getPassword());
-                if (newPassword.equals(confirmPassword)) {
-                    if (resetPassword(username, newPassword)) {
-                        messageLabel.setText("Password reset successfully!");
-                        resetPasswordFrame.dispose();
-                        showUserLoginForm(parentFrame);
-                    } else {
-                        messageLabel.setText("Password reset failed.");
-                    }
-                } else {
-                    messageLabel.setText("Passwords do not match.");
-                }
-            }
-        });
-
-        resetPasswordFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                parentFrame.setVisible(true);
-            }
-        });
-    }
-
-    private static boolean resetPassword(String username, String newPassword) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            // First, check if the user is an agent or a superior
-            String userTypeQuery = "SELECT 'Agent' AS userType FROM Agent WHERE login = ? UNION SELECT 'Superieur' AS userType FROM superieur WHERE login = ?";
-            try (PreparedStatement userTypeStmt = conn.prepareStatement(userTypeQuery)) {
-                userTypeStmt.setString(1, username);
-                userTypeStmt.setString(2, username);
-                ResultSet rs = userTypeStmt.executeQuery();
-                if (rs.next()) {
-                    String userType = rs.getString("userType");
-                    String updateQuery;
-                    if ("Agent".equalsIgnoreCase(userType)) {
-                        updateQuery = "UPDATE Agent SET pass = ? WHERE login = ?";
-                    } else {
-                        updateQuery = "UPDATE superieur SET pass = ? WHERE login = ?";
-                    }
-                    try (PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
-                        updateStmt.setString(1, newPassword);
-                        updateStmt.setString(2, username);
-                        int affectedRows = updateStmt.executeUpdate();
-                        return affectedRows > 0;
-                    }
-                } else {
-                    return false; // User not found
-                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
