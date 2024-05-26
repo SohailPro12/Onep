@@ -146,6 +146,18 @@ dashboardFrame.add(scrollPane, gbc);
         gbc.gridy = 3;
         JTextField searchBar = new JTextField(15);
         dashboardFrame.add(searchBar, gbc);
+        // View Credentials button
+        gbc.gridx = 5;
+        gbc.gridy = 4;
+        JButton viewCredentialsButton = new JButton("View Credentials");
+        dashboardFrame.add(viewCredentialsButton, gbc);
+
+        viewCredentialsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showCredentialsView();
+            }
+        });
+
 
         dashboardFrame.setVisible(true);
 
@@ -215,12 +227,8 @@ dashboardFrame.add(scrollPane, gbc);
         loadAgents(departmentComboBox, agentComboBox);
         agentComboBox.setSelectedItem(agentName);
     }
-});
+    
 
-departmentComboBox.addActionListener(e -> {
-    if (departmentComboBox.getSelectedItem() != null) {
-        loadAgents(departmentComboBox, agentComboBox);
-    }
 });
 
     }
@@ -514,7 +522,7 @@ private static int getDepartmentId(String departmentName) {
         JFreeChart barChart = ChartFactory.createBarChart(
                 "Task Progression",
                 "Task",
-                "Progression", 
+                "Progression",
                 dataset,
                 PlotOrientation.VERTICAL,
                 true, true, false);
@@ -525,5 +533,43 @@ private static int getDepartmentId(String departmentName) {
 
         statsFrame.setVisible(true);
     }
+ 
+ private static void showCredentialsView() {
+    JFrame credentialsFrame = new JFrame("Credentials View");
+    credentialsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    credentialsFrame.setSize(600, 400);
+
+    // Create a table to display credentials
+    String[] columnNames = {"Name", "Username", "Password"};
+    DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+    JTable credentialsTable = new JTable(tableModel);
+    JScrollPane scrollPane = new JScrollPane(credentialsTable);
+    credentialsFrame.add(scrollPane);
+
+    // Load credentials from the database
+    loadCredentials(tableModel);
+
+    credentialsFrame.setVisible(true);
+}
+
+private static void loadCredentials(DefaultTableModel tableModel) {
+    // Fetch credentials from the database and populate the table
+    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+        String query = "SELECT NomComplete, login, password FROM agent UNION SELECT NomComplete, login, password FROM superieur";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Object[] row = {
+                        rs.getString("NomComplete"),
+                        rs.getString("login"),
+                        rs.getString("password")
+                };
+                tableModel.addRow(row);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
 
 }
