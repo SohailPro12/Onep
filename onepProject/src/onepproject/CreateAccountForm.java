@@ -1,6 +1,7 @@
 package onepproject;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,77 +21,125 @@ public class CreateAccountForm extends JDialog {
 
     public CreateAccountForm(JFrame parentFrame) {
         super(parentFrame, "Create Account", true);
-        setSize(400, 350);
+        setSize(450, 400);
         setLocationRelativeTo(parentFrame);
         setLayout(new BorderLayout(10, 10));
+        setResizable(false);
 
-        JPanel formPanel = new JPanel(new GridLayout(6, 2, 5, 5)); // Adjusting grid layout for extra row
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         add(formPanel, BorderLayout.CENTER);
 
-        formPanel.add(new JLabel("Nom d'utilisateur:"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel loginLabel = new JLabel("Nom d'utilisateur:");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        formPanel.add(loginLabel, gbc);
+
         loginField = new JTextField();
-        formPanel.add(loginField);
+        loginField.setToolTipText("Enter your username");
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        formPanel.add(loginField, gbc);
 
-        formPanel.add(new JLabel("Mot de passe:"));
+        JLabel passwordLabel = new JLabel("Mot de passe:");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        formPanel.add(passwordLabel, gbc);
+
         passwordField = new JPasswordField();
-        formPanel.add(passwordField);
+        passwordField.setToolTipText("Enter your password");
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        formPanel.add(passwordField, gbc);
 
-        formPanel.add(new JLabel("Nom complet:"));
+        JLabel fullNameLabel = new JLabel("Nom complet:");
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        formPanel.add(fullNameLabel, gbc);
+
         fullNameField = new JTextField();
-        formPanel.add(fullNameField);
+        fullNameField.setToolTipText("Enter your full name");
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        formPanel.add(fullNameField, gbc);
 
-        formPanel.add(new JLabel("Poste:"));
+        JLabel positionLabel = new JLabel("Poste:");
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        formPanel.add(positionLabel, gbc);
+
         positionField = new JTextField();
-        formPanel.add(positionField);
+        positionField.setToolTipText("Enter your position");
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        formPanel.add(positionField, gbc);
 
-        formPanel.add(new JLabel("Département:"));
+        JLabel departmentLabel = new JLabel("Département:");
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        formPanel.add(departmentLabel, gbc);
+
         departmentField = new JTextField();
-        formPanel.add(departmentField);
+        departmentField.setToolTipText("Enter your department");
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        formPanel.add(departmentField, gbc);
 
-        // Adding radio buttons for Supérieur or Agent
-        formPanel.add(new JLabel("Compte que vous créez:"));
+        JLabel roleLabel = new JLabel("Compte que vous créez:");
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        formPanel.add(roleLabel, gbc);
+
         JPanel rolePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         superieurRadioButton = new JRadioButton("Supérieur");
         agentRadioButton = new JRadioButton("Agent");
 
-        // Group the radio buttons to ensure only one can be selected
         ButtonGroup roleGroup = new ButtonGroup();
         roleGroup.add(superieurRadioButton);
         roleGroup.add(agentRadioButton);
 
         rolePanel.add(superieurRadioButton);
         rolePanel.add(agentRadioButton);
-        formPanel.add(rolePanel);
+
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        formPanel.add(rolePanel, gbc);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         add(buttonPanel, BorderLayout.SOUTH);
 
         JButton createButton = new JButton("Créer");
-        JButton cancelButton = new JButton("Annuler");
-
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String login = loginField.getText();
-                String password = new String(passwordField.getPassword());
-                String fullName = fullNameField.getText();
-                String position = positionField.getText();
-                String department = departmentField.getText();
-                String role = superieurRadioButton.isSelected() ? "Supérieur" : "Agent";
+                if (validateInputs()) {
+                    String login = loginField.getText();
+                    String password = new String(passwordField.getPassword());
+                    String fullName = fullNameField.getText();
+                    String position = positionField.getText();
+                    String department = departmentField.getText();
+                    String role = superieurRadioButton.isSelected() ? "Supérieur" : "Agent";
 
-                // Display entered data in a dialog
-                JOptionPane.showMessageDialog(CreateAccountForm.this,
-                        "Nom d'utilisateur: " + login + "\nMot de passe: " + password + "\nNom complet: " + fullName +
-                                "\nPoste: " + position + "\nDépartement: " + department + "\nCompte: " + role,
-                        "Compte créé", JOptionPane.INFORMATION_MESSAGE);
+                    // Display entered data in a dialog
+                    JOptionPane.showMessageDialog(CreateAccountForm.this,
+                            "Nom d'utilisateur: " + login + "\nMot de passe: " + password + "\nNom complet: " + fullName +
+                                    "\nPoste: " + position + "\nDépartement: " + department + "\nCompte: " + role,
+                            "Compte créé", JOptionPane.INFORMATION_MESSAGE);
 
-                // Insert data into the database
-                insertDataIntoDatabase(login, password, fullName, position, department, role);
+                    // Insert data into the database
+                    insertDataIntoDatabase(login, password, fullName, position, department, role);
 
-                dispose(); // Close the form
+                    dispose(); // Close the form
+                }
             }
         });
 
+        JButton cancelButton = new JButton("Annuler");
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -100,6 +149,19 @@ public class CreateAccountForm extends JDialog {
 
         buttonPanel.add(createButton);
         buttonPanel.add(cancelButton);
+    }
+
+    private boolean validateInputs() {
+        if (loginField.getText().isEmpty() ||
+                passwordField.getPassword().length == 0 ||
+                fullNameField.getText().isEmpty() ||
+                positionField.getText().isEmpty() ||
+                departmentField.getText().isEmpty() ||
+                (!superieurRadioButton.isSelected() && !agentRadioButton.isSelected())) {
+            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs et sélectionner un rôle.", "Champs manquants", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
     }
 
     private void insertDataIntoDatabase(String login, String password, String fullName, String position, String department, String role) {
@@ -131,6 +193,11 @@ public class CreateAccountForm extends JDialog {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
             JFrame frame = new JFrame("Test");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 400);
