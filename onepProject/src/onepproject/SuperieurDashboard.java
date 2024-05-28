@@ -325,7 +325,7 @@ private static int getDepartmentId(String departmentName) {
    private static void loadTasks(DefaultTableModel tableModel) {
     tableModel.setRowCount(0); // Clear the table
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-        String query = "SELECT t.id, Titre, t.Description, t.Agent, budget, c.Description as commentaires, c.progression FROM tache t, commentaires c where t.id = c.Id_Tache";
+        String query = "SELECT t.id, Titre, t.Description, t.Agent, budget, c.comment as commentaires, c.progression FROM tache t, commentaires c where t.id = c.Id_Tache";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
