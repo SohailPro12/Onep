@@ -1,4 +1,5 @@
 package onepproject;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -6,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.Vector;
-
 
 public class AdminDashboard {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/onep_db";
@@ -82,10 +82,10 @@ public class AdminDashboard {
                     String login = (String) table.getValueAt(selectedRow, 0);
                     String email = (String) table.getValueAt(selectedRow, 1);
                     String number = (String) table.getValueAt(selectedRow, 2);
-                    
+
                     // Perform actions with retrieved data
                     JOptionPane.showMessageDialog(adminDashboardFrame, "Selected row:\nLogin: " + login + "\nEmail: " + email + "\nNumber: " + number);
-                    
+
                     // Delete selected row from database
                     if (deleteRowFromDatabase(login)) {
                         // Remove row from table

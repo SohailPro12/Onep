@@ -16,12 +16,14 @@ public class CreateAccountForm extends JDialog {
     private JTextField fullNameField;
     private JTextField positionField;
     private JTextField departmentField;
+    private JTextField emailField;
+    private JTextField phoneField; // New field for phone number
     private JRadioButton superieurRadioButton;
     private JRadioButton agentRadioButton;
 
     public CreateAccountForm(JFrame parentFrame) {
         super(parentFrame, "Create Account", true);
-        setSize(450, 400);
+        setSize(450, 500);
         setLocationRelativeTo(parentFrame);
         setLayout(new BorderLayout(10, 10));
         setResizable(false);
@@ -89,9 +91,31 @@ public class CreateAccountForm extends JDialog {
         gbc.gridy = 4;
         formPanel.add(departmentField, gbc);
 
-        JLabel roleLabel = new JLabel("Compte que vous créez:");
+        JLabel emailLabel = new JLabel("Email:");
         gbc.gridx = 0;
         gbc.gridy = 5;
+        formPanel.add(emailLabel, gbc);
+
+        emailField = new JTextField();
+        emailField.setToolTipText("Enter your email");
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        formPanel.add(emailField, gbc);
+
+        JLabel phoneLabel = new JLabel("Numéro de téléphone:"); // New label for phone number
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        formPanel.add(phoneLabel, gbc);
+
+        phoneField = new JTextField(); // New text field for phone number
+        phoneField.setToolTipText("Enter your phone number");
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        formPanel.add(phoneField, gbc);
+
+        JLabel roleLabel = new JLabel("Compte que vous créez:");
+        gbc.gridx = 0;
+        gbc.gridy = 7;
         formPanel.add(roleLabel, gbc);
 
         JPanel rolePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -106,7 +130,7 @@ public class CreateAccountForm extends JDialog {
         rolePanel.add(agentRadioButton);
 
         gbc.gridx = 1;
-        gbc.gridy = 5;
+        gbc.gridy = 7;
         formPanel.add(rolePanel, gbc);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -123,16 +147,18 @@ public class CreateAccountForm extends JDialog {
                     String fullName = fullNameField.getText();
                     String position = positionField.getText();
                     String department = departmentField.getText();
+                    String email = emailField.getText();
+                    String phone = phoneField.getText(); // Get phone number
                     String role = superieurRadioButton.isSelected() ? "Supérieur" : "Agent";
 
                     // Display entered data in a dialog
                     JOptionPane.showMessageDialog(CreateAccountForm.this,
                             "Nom d'utilisateur: " + login + "\nMot de passe: " + password + "\nNom complet: " + fullName +
-                                    "\nPoste: " + position + "\nDépartement: " + department + "\nCompte: " + role,
+                                    "\nPoste: " + position + "\nDépartement: " + department + "\nEmail: " + email + "\nNuméro de téléphone: " + phone + "\nCompte: " + role,
                             "Compte créé", JOptionPane.INFORMATION_MESSAGE);
 
                     // Insert data into the database
-                    insertDataIntoDatabase(login, password, fullName, position, department, role);
+                    insertDataIntoDatabase(login, password, fullName, position, department, email, phone, role);
 
                     dispose(); // Close the form
                 }
@@ -157,6 +183,8 @@ public class CreateAccountForm extends JDialog {
                 fullNameField.getText().isEmpty() ||
                 positionField.getText().isEmpty() ||
                 departmentField.getText().isEmpty() ||
+                emailField.getText().isEmpty() ||
+                phoneField.getText().isEmpty() || // Validate phone number
                 (!superieurRadioButton.isSelected() && !agentRadioButton.isSelected())) {
             JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs et sélectionner un rôle.", "Champs manquants", JOptionPane.WARNING_MESSAGE);
             return false;
@@ -164,16 +192,16 @@ public class CreateAccountForm extends JDialog {
         return true;
     }
 
-    private void insertDataIntoDatabase(String login, String password, String fullName, String position, String department, String role) {
+    private void insertDataIntoDatabase(String login, String password, String fullName, String position, String department, String email, String phone, String role) {
         String url = "jdbc:mysql://localhost:3306/onep_db";
         String username = "root"; // Change to your database username
         String dbPassword = ""; // Change to your database password
 
         String insertSQL;
         if ("Supérieur".equals(role)) {
-            insertSQL = "INSERT INTO superieur (login, pass, NomComplete, Post, Departement) VALUES (?, ?, ?, ?, ?)";
+            insertSQL = "INSERT INTO superieur (login, pass, NomComplete, Post, Departement, email, numero_tel) VALUES (?, ?, ?, ?, ?, ?, ?)";
         } else {
-            insertSQL = "INSERT INTO agent (login, pass, NomComplete, Post, Departement) VALUES (?, ?, ?, ?, ?)";
+            insertSQL = "INSERT INTO agent (login, pass, NomComplete, Post, Departement, email, numero_tel) VALUES (?, ?, ?, ?, ?, ?, ?)";
         }
 
         try (Connection conn = DriverManager.getConnection(url, username, dbPassword);
@@ -184,6 +212,8 @@ public class CreateAccountForm extends JDialog {
             pstmt.setString(3, fullName);
             pstmt.setString(4, position);
             pstmt.setString(5, department);
+            pstmt.setString(6, email);
+            pstmt.setString(7, phone); // Set phone number
 
             pstmt.executeUpdate();
         } catch (SQLException ex) {
