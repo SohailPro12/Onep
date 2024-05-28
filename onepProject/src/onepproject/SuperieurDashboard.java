@@ -366,7 +366,7 @@ private static int getDepartmentId(String departmentName) {
                 stmt.setString(6, sup);
                 stmt.executeUpdate();
             }
-            String query2 = "INSERT INTO commentaires (Description, Agent, Id_Tache,progression) VALUES (?, ?, ?,?)";
+            String query2 = "INSERT INTO commentaires (comment, Agent, Id_Tache,progression) VALUES (?, ?, ?,?)";
             try (PreparedStatement stmt = conn.prepareStatement(query2)) {
                 stmt.setString(1, "");
                 stmt.setString(2, agentName);

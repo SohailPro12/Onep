@@ -14,11 +14,14 @@ public class UserLoginForm {
     public static void showUserLoginForm(JFrame parentFrame) {
         JFrame userFrame = new JFrame("User Login");
         userFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        userFrame.setSize(400, 300);
+        userFrame.setSize(1000, 600);
+        userFrame.setLocationRelativeTo(null);
+        userFrame.setResizable(false); // Disable resizing
         userFrame.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -39,14 +42,17 @@ public class UserLoginForm {
         gbc.gridx = 1;
         gbc.gridy = 2;
         JButton userLoginButton = new JButton("Login");
+        styleButton(userLoginButton);
         userFrame.add(userLoginButton, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 3;
         JButton forgotPasswordButton = new JButton("Forgot Password");
+        styleButton(forgotPasswordButton);
         userFrame.add(forgotPasswordButton, gbc);
 
         JLabel messageLabel = new JLabel("");
+        messageLabel.setForeground(Color.RED);
         gbc.gridx = 1;
         gbc.gridy = 4;
         userFrame.add(messageLabel, gbc);
@@ -131,10 +137,13 @@ public class UserLoginForm {
         JFrame forgotPasswordFrame = new JFrame("Forgot Password");
         forgotPasswordFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         forgotPasswordFrame.setSize(400, 400);
+        forgotPasswordFrame.setLocationRelativeTo(null);
+        forgotPasswordFrame.setResizable(false); // Disable resizing
         forgotPasswordFrame.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -163,14 +172,17 @@ public class UserLoginForm {
         gbc.gridx = 1;
         gbc.gridy = 3;
         JButton submitButton = new JButton("Submit");
+        styleButton(submitButton);
         forgotPasswordFrame.add(submitButton, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 4;
         JButton proceedButton = new JButton("Proceed");
+        styleButton(proceedButton);
         forgotPasswordFrame.add(proceedButton, gbc);
 
         JLabel messageLabel = new JLabel("");
+        messageLabel.setForeground(Color.RED);
         gbc.gridx = 1;
         gbc.gridy = 5;
         forgotPasswordFrame.add(messageLabel, gbc);
@@ -231,10 +243,13 @@ public class UserLoginForm {
         JFrame recoveryCodeFrame = new JFrame("Enter Recovery Code");
         recoveryCodeFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         recoveryCodeFrame.setSize(400, 300);
+        recoveryCodeFrame.setLocationRelativeTo(null);
+        recoveryCodeFrame.setResizable(false); // Disable resizing
         recoveryCodeFrame.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -255,9 +270,11 @@ public class UserLoginForm {
         gbc.gridx = 1;
         gbc.gridy = 2;
         JButton verifyButton = new JButton("Verify");
+        styleButton(verifyButton);
         recoveryCodeFrame.add(verifyButton, gbc);
 
         JLabel messageLabel = new JLabel("");
+        messageLabel.setForeground(Color.RED);
         gbc.gridx = 1;
         gbc.gridy = 3;
         recoveryCodeFrame.add(messageLabel, gbc);
@@ -270,7 +287,8 @@ public class UserLoginForm {
                 String code = codeField.getText();
                 if (verifyRecoveryCode(username, code)) {
                     messageLabel.setText("Code verified. You may now reset your password.");
-                    // Add code to show password reset form
+                    showResetPasswordForm(parentFrame, username);
+                    recoveryCodeFrame.dispose();
                 } else {
                     messageLabel.setText("Invalid username or recovery code.");
                 }
@@ -298,5 +316,98 @@ public class UserLoginForm {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private static void showResetPasswordForm(JFrame parentFrame, String username) {
+        JFrame resetPasswordFrame = new JFrame("Reset Password");
+        resetPasswordFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        resetPasswordFrame.setSize(400, 300);
+        resetPasswordFrame.setLocationRelativeTo(null);
+        resetPasswordFrame.setResizable(false); // Disable resizing
+        resetPasswordFrame.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        resetPasswordFrame.add(new JLabel("New Password:"), gbc);
+
+        gbc.gridx = 1;
+        JPasswordField newPasswordField = new JPasswordField(15);
+        resetPasswordFrame.add(newPasswordField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        resetPasswordFrame.add(new JLabel("Confirm Password:"), gbc);
+
+        gbc.gridx = 1;
+        JPasswordField confirmPasswordField = new JPasswordField(15);
+        resetPasswordFrame.add(confirmPasswordField, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        JButton resetPasswordButton = new JButton("Reset Password");
+        styleButton(resetPasswordButton);
+        resetPasswordFrame.add(resetPasswordButton, gbc);
+
+        JLabel messageLabel = new JLabel("");
+        messageLabel.setForeground(Color.RED);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        resetPasswordFrame.add(messageLabel, gbc);
+
+        resetPasswordFrame.setVisible(true);
+
+        resetPasswordButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String newPassword = new String(newPasswordField.getPassword());
+                String confirmPassword = new String(confirmPasswordField.getPassword());
+                if (newPassword.equals(confirmPassword)) {
+                    if (resetUserPassword(username, newPassword)) {
+                        messageLabel.setForeground(Color.GREEN);
+                        messageLabel.setText("Password reset successfully.");
+                        resetPasswordFrame.dispose();
+                        parentFrame.setVisible(true);
+                    } else {
+                        messageLabel.setText("Error resetting password. Please try again.");
+                    }
+                } else {
+                    messageLabel.setText("Passwords do not match.");
+                }
+            }
+        });
+
+        resetPasswordFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                parentFrame.setVisible(true);
+            }
+        });
+    }
+
+    private static boolean resetUserPassword(String username, String newPassword) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "UPDATE Agent SET pass = ? WHERE login = ? UNION UPDATE superieur SET pass = ? WHERE login = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, newPassword);
+                stmt.setString(2, username);
+                stmt.setString(3, newPassword);
+                stmt.setString(4, username);
+                int affectedRows = stmt.executeUpdate();
+                return affectedRows > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static void styleButton(JButton button) {
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
     }
 }

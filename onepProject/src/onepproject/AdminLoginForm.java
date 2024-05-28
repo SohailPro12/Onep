@@ -14,11 +14,14 @@ public class AdminLoginForm {
     public static void showAdminLoginForm(JFrame parentFrame) {
         JFrame adminFrame = new JFrame("Admin Login");
         adminFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        adminFrame.setSize(400, 200);
+        adminFrame.setSize(1000, 600);
+        adminFrame.setLocationRelativeTo(null);
+        adminFrame.setResizable(false); // Disable resizing
         adminFrame.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -39,7 +42,14 @@ public class AdminLoginForm {
         gbc.gridx = 1;
         gbc.gridy = 2;
         JButton adminLoginButton = new JButton("Login");
+        styleButton(adminLoginButton);
         adminFrame.add(adminLoginButton, gbc);
+
+        JLabel messageLabel = new JLabel("");
+        messageLabel.setForeground(Color.RED);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        adminFrame.add(messageLabel, gbc);
 
         adminFrame.setVisible(true);
 
@@ -61,27 +71,31 @@ public class AdminLoginForm {
                     adminFrame.dispose();
                     AdminDashboard.showAdminDashboard(parentFrame);
                 } else {
-                    JOptionPane.showMessageDialog(adminFrame, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
+                    messageLabel.setText("Invalid username or password.");
                 }
             }
         });
     }
 
     private static boolean authenticateAdmin(String username, String password) {
-        boolean isAuthenticated = false;
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT * FROM admin WHERE login = ? AND pass = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, username);
                 stmt.setString(2, password);
                 ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    isAuthenticated = true;
-                }
+                return rs.next();
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return isAuthenticated;
+    }
+
+    private static void styleButton(JButton button) {
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
     }
 }
