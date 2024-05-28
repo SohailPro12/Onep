@@ -41,6 +41,40 @@ public class AgentDashboard extends JFrame {
         }
     }
 
+    // Method to insert comment into the database
+    private void insertCommentIntoDatabase(int taskId, String comment, String progression, String agent) {
+        // Calculate numeric progression based on the progression label
+        int numericProgression = calculateProgression(progression);
+
+        String query = "INSERT INTO commentaires (comment, Agent, Id_Tache, progression) VALUES (?, ?, ?, ?)";
+        try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, comment);
+            preparedStatement.setString(2, agent);
+            preparedStatement.setInt(3, taskId);
+            preparedStatement.setInt(4, numericProgression); // Insert numeric progression
+            preparedStatement.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Comment sent successfully!");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error inserting comment into database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    // Method to calculate numeric progression based on the progression label
+    private int calculateProgression(String progressionLabel) {
+        switch (progressionLabel) {
+            case "Not Started":
+                return 0;
+            case "In Progress":
+                return 50;
+            case "Completed":
+                return 100;
+            default:
+                return 0; // Default to Not Started if unknown
+        }
+    }
+
     // Constructor
     public AgentDashboard(String username) {
         setTitle("Agent Dashboard - Welcome " + username);
@@ -112,13 +146,30 @@ public class AgentDashboard extends JFrame {
                     String superieur = taskTable.getValueAt(selectedRow, 3).toString();
                     String comment = commentField.getText();
                     String progression = progressionComboBox.getSelectedItem().toString();
-                    JOptionPane.showMessageDialog(null, "Modifier Task ID: " + taskId + "\nTitle: " + title + "\nDescription: " + description + "\nSuperieur: " + superieur + "\nComment: " + comment + "\nProgression: " + progression);
+                    JOptionPane.showMessageDialog(null, "Modify Task ID: " + taskId + "\nTitle: " + title + "\nDescription: " + description + "\nSuperieur: " + superieur + "\nComment: " + comment + "\nProgression: " + progression);
                 } else {
                     JOptionPane.showMessageDialog(null, "Please select a task to modify.");
                 }
             }
         });
         buttonsSubPanel.add(modifierButton);
+
+        // Send Comment button
+        JButton sendCommentButton = new JButton("Send Comment");
+        sendCommentButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = taskTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    int taskId = Integer.parseInt(taskTable.getValueAt(selectedRow, 0).toString());
+                    String comment = commentField.getText();
+                    String progression = progressionComboBox.getSelectedItem().toString();
+                    insertCommentIntoDatabase(taskId, comment, progression, username);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please select a task to comment on.");
+                }
+            }
+        });
+        buttonsSubPanel.add(sendCommentButton);
 
         // Logout button
         JButton logoutButton = new JButton("Logout");
@@ -144,6 +195,6 @@ public class AgentDashboard extends JFrame {
     }
 
     public static void main(String[] args) {
-        showAgentDashboard("AgentUsername");
+        showAgentDashboard("sohail"); // Example username
     }
 }

@@ -61,7 +61,7 @@ public class OnepProject {
         // Load and scale logo
         BufferedImage originalLogo = null;
         try {
-            originalLogo = ImageIO.read(new File("C:\\Users\\PC\\OneDrive\\Documents\\NetBeansProjects\\Onep\\onepProject\\src\\images\\ONEP-removebg-preview.png"));
+            originalLogo = ImageIO.read(new File("C:\\Users\\LENOVO\\Documents\\NetBeansProjects\\Onep\\onepProject\\src\\images\\WhatsApp Image 2024-05-28 à 18.39.20_1d42cc15.jpg"));
         } catch (IOException e) {
             e.printStackTrace();
         }
