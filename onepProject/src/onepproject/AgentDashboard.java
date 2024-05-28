@@ -41,25 +41,29 @@ public class AgentDashboard extends JFrame {
         }
     }
 
-    // Method to insert comment into the database
-    private void insertCommentIntoDatabase(int taskId, String comment, String progression, String agent) {
-        // Calculate numeric progression based on the progression label
-        int numericProgression = calculateProgression(progression);
+ private void insertCommentIntoDatabase(int taskId, String comment, String progression, String agent) {
+    // Calculate numeric progression based on the progression label
+    int numericProgression = calculateProgression(progression);
 
-        String query = "INSERT INTO commentaires (comment, Agent, Id_Tache, progression) VALUES (?, ?, ?, ?)";
-        try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, comment);
-            preparedStatement.setString(2, agent);
-            preparedStatement.setInt(3, taskId);
-            preparedStatement.setInt(4, numericProgression); // Insert numeric progression
-            preparedStatement.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Comment sent successfully!");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error inserting comment into database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+    String query = "UPDATE commentaires SET comment=?, progression=?, Agent=? WHERE id=?";
+    try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
+         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        preparedStatement.setString(1, comment);
+        preparedStatement.setInt(2, numericProgression); // Insert numeric progression
+        preparedStatement.setString(3, agent);
+        preparedStatement.setInt(4, taskId);
+        
+        int rowsUpdated = preparedStatement.executeUpdate();
+        if (rowsUpdated > 0) {
+            JOptionPane.showMessageDialog(this, "Comment updated successfully!");
+        } else {
+            JOptionPane.showMessageDialog(this, "No comment found with id " + taskId, "Update Error", JOptionPane.ERROR_MESSAGE);
         }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error updating comment in database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
     }
+}
 
     // Method to calculate numeric progression based on the progression label
     private int calculateProgression(String progressionLabel) {
