@@ -395,6 +395,12 @@ private static int getDepartmentId(String departmentName) {
                     stmt.executeUpdate();
                     
                 }
+                String query2 = "DELETE FROM commentaires WHERE id_tache = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(query2)) {
+                    stmt.setInt(1, taskId);
+                    stmt.executeUpdate();
+                    
+                }
                 tableModel.removeRow(selectedRow);
             } catch (SQLException e) {
                 e.printStackTrace();
