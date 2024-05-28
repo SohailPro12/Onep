@@ -45,7 +45,7 @@ public class AgentDashboard extends JFrame {
     // Calculate numeric progression based on the progression label
     int numericProgression = calculateProgression(progression);
 
-    String query = "UPDATE commentaires SET comment=?, progression=?, Agent=? WHERE id=?";
+    String query = "UPDATE commentaires SET comment=?, progression=?, Agent=? WHERE id_Tache=?";
     try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
          PreparedStatement preparedStatement = connection.prepareStatement(query)) {
         preparedStatement.setString(1, comment);
