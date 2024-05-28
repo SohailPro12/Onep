@@ -200,7 +200,7 @@ dashboardFrame.add(scrollPane, gbc);
         logoutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dashboardFrame.dispose();
-                parentFrame.setVisible(true);
+                UserLoginForm.showUserLoginForm(parentFrame);
             }
         });
 
@@ -540,7 +540,7 @@ private static int getDepartmentId(String departmentName) {
     credentialsFrame.setSize(600, 400);
 
     // Create a table to display credentials
-    String[] columnNames = {"Name", "Username", "Password"};
+    String[] columnNames = {"Name", "Username", "Email", "Phone"};
     DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
     JTable credentialsTable = new JTable(tableModel);
     JScrollPane scrollPane = new JScrollPane(credentialsTable);
@@ -555,14 +555,15 @@ private static int getDepartmentId(String departmentName) {
 private static void loadCredentials(DefaultTableModel tableModel) {
     // Fetch credentials from the database and populate the table
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-        String query = "SELECT NomComplete, login, password FROM agent UNION SELECT NomComplete, login, password FROM superieur";
+        String query = "SELECT NomComplete, login, email, numero_tel FROM agent UNION SELECT NomComplete, login, email,numero_tel FROM superieur";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Object[] row = {
                         rs.getString("NomComplete"),
                         rs.getString("login"),
-                        rs.getString("password")
+                        rs.getString("email"),
+                        rs.getString("numero_tel")
                 };
                 tableModel.addRow(row);
             }
