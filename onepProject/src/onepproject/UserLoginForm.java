@@ -14,7 +14,7 @@ public class UserLoginForm {
     public static void showUserLoginForm(JFrame parentFrame) {
         JFrame userFrame = new JFrame("User Login");
         userFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        userFrame.setSize(1000, 600);
+        userFrame.setSize(1200, 800);
         userFrame.setLocationRelativeTo(null);
         userFrame.setResizable(false); // Disable resizing
         userFrame.setLayout(new GridBagLayout());

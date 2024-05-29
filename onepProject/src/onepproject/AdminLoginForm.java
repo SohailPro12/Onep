@@ -14,7 +14,7 @@ public class AdminLoginForm {
     public static void showAdminLoginForm(JFrame parentFrame) {
         JFrame adminFrame = new JFrame("Admin Login");
         adminFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        adminFrame.setSize(1000, 600);
+        adminFrame.setSize(1200, 800);
         adminFrame.setLocationRelativeTo(null);
         adminFrame.setResizable(false); // Disable resizing
         adminFrame.setLayout(new GridBagLayout());

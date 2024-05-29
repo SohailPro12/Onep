@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.*;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -24,6 +25,9 @@ public class SuperieurDashboard {
         JFrame dashboardFrame = new JFrame("Superieur Dashboard");
         dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         dashboardFrame.setSize(1200, 800);
+        
+        dashboardFrame.setLocationRelativeTo(null);
+        dashboardFrame.setResizable(false); // Disable resizing
         dashboardFrame.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -33,8 +37,9 @@ public class SuperieurDashboard {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
         JLabel taskFormLabel = new JLabel("Task Form");
-        taskFormLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        taskFormLabel.setFont(new Font("Arial", Font.BOLD, 20));
         dashboardFrame.add(taskFormLabel, gbc);
 
         gbc.gridwidth = 1;
@@ -43,7 +48,7 @@ public class SuperieurDashboard {
         dashboardFrame.add(new JLabel("Task ID:"), gbc);
 
         gbc.gridx = 1;
-        JTextField taskIdField = new JTextField(15);
+        JTextField taskIdField = new JTextField(20);
         taskIdField.setEditable(false);
         dashboardFrame.add(taskIdField, gbc);
 
@@ -52,7 +57,7 @@ public class SuperieurDashboard {
         dashboardFrame.add(new JLabel("Title:"), gbc);
 
         gbc.gridx = 1;
-        JTextField titleField = new JTextField(15);
+        JTextField titleField = new JTextField(20);
         dashboardFrame.add(titleField, gbc);
 
         gbc.gridx = 0;
@@ -60,7 +65,7 @@ public class SuperieurDashboard {
         dashboardFrame.add(new JLabel("Description:"), gbc);
 
         gbc.gridx = 1;
-        JTextField descriptionField = new JTextField(15);
+        JTextField descriptionField = new JTextField(20);
         dashboardFrame.add(descriptionField, gbc);
 
         gbc.gridx = 0;
@@ -87,7 +92,7 @@ public class SuperieurDashboard {
         dashboardFrame.add(new JLabel("Budget:"), gbc);
 
         gbc.gridx = 1;
-        JTextField budgetField = new JTextField(15);
+        JTextField budgetField = new JTextField(20);
         dashboardFrame.add(budgetField, gbc);
 
         gbc.gridx = 0;
@@ -95,7 +100,7 @@ public class SuperieurDashboard {
         dashboardFrame.add(new JLabel("Superieur:"), gbc);
 
         gbc.gridx = 1;
-        JTextField supField = new JTextField(15);
+        JTextField supField = new JTextField(20);
         dashboardFrame.add(supField, gbc);
 
         // Task buttons in one line
@@ -107,13 +112,14 @@ public class SuperieurDashboard {
         JButton addButton = new JButton("Ajouter");
         JButton deleteButton = new JButton("Supprimer");
         JButton modifyButton = new JButton("Modifier");
-        JButton searchButton = new JButton("Chercher");
+        JButton clearButton = new JButton("Clear");
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(modifyButton);
-        buttonPanel.add(searchButton);
+        buttonPanel.add(clearButton);
         dashboardFrame.add(buttonPanel, gbc);
 
+        // DataGrid view
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridheight = 10;
@@ -124,52 +130,56 @@ public class SuperieurDashboard {
         JScrollPane scrollPane = new JScrollPane(taskTable);
         dashboardFrame.add(scrollPane, gbc);
 
-        // Other buttons
+        // Expand button next to DataGrid view
         gbc.gridx = 5;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
+        gbc.gridy = 10;
         gbc.gridheight = 1;
-        JButton logoutButton = new JButton("Logout");
-        dashboardFrame.add(logoutButton, gbc);
-
-        gbc.gridx = 5;
-        gbc.gridy = 1;
-        JButton statsButton = new JButton("Statistiques");
-        dashboardFrame.add(statsButton, gbc);
+        gbc.gridwidth = 1;
+        JButton expandButton = new JButton("Expand");
+        dashboardFrame.add(expandButton, gbc);
 
         // Search by Task ID
-        gbc.gridx = 5;
-        gbc.gridy = 2;
+        gbc.gridx = 2;
+        gbc.gridy = 11;
+        gbc.gridheight = 1;
+        gbc.gridwidth = 1;
         JLabel searchLabel = new JLabel("Search by Task ID:");
         dashboardFrame.add(searchLabel, gbc);
 
-        gbc.gridx = 5;
-        gbc.gridy = 3;
+        gbc.gridx = 3;
+        gbc.gridy = 11;
         JTextField searchBar = new JTextField(15);
         dashboardFrame.add(searchBar, gbc);
 
         // Search by Agent Name
-        gbc.gridx = 5;
-        gbc.gridy = 4;
+        gbc.gridx = 2;
+        gbc.gridy = 12;
         JLabel searchAgentLabel = new JLabel("Search by Agent Name:");
         dashboardFrame.add(searchAgentLabel, gbc);
 
-        gbc.gridx = 5;
-        gbc.gridy = 5;
+        gbc.gridx = 3;
+        gbc.gridy = 12;
         JTextField searchAgentBar = new JTextField(15);
         dashboardFrame.add(searchAgentBar, gbc);
 
-        // View Credentials button
-        gbc.gridx = 5;
-        gbc.gridy = 6;
+        // Statistiques and View Credentials buttons in one line
+        gbc.gridx = 2;
+        gbc.gridy = 13;
+        gbc.gridwidth = 2;
+        JPanel statsCredButtonPanel = new JPanel();
+        statsCredButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        JButton statsButton = new JButton("Statistiques");
         JButton viewCredentialsButton = new JButton("View Credentials");
-        dashboardFrame.add(viewCredentialsButton, gbc);
+        statsCredButtonPanel.add(statsButton);
+        statsCredButtonPanel.add(viewCredentialsButton);
+        dashboardFrame.add(statsCredButtonPanel, gbc);
 
-        viewCredentialsButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showCredentialsView();
-            }
-        });
+        // Logout button at the bottom
+        gbc.gridx = 5;
+        gbc.gridy = 13;
+        gbc.gridwidth = 1;
+        JButton logoutButton = new JButton("Logout");
+        dashboardFrame.add(logoutButton, gbc);
 
         dashboardFrame.setVisible(true);
 
@@ -202,7 +212,7 @@ public class SuperieurDashboard {
             }
         });
 
-        searchButton.addActionListener(new ActionListener() {
+        searchBar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 searchTasksById(searchBar, tableModel);
             }
@@ -220,11 +230,26 @@ public class SuperieurDashboard {
                 showStatistics();
             }
         });
+        viewCredentialsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showCredentialsView();
+            }
+        });
 
         searchAgentBar.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 searchTasksByAgentName(searchAgentBar, tableModel);
+            }
+        });
+
+        expandButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFrame expandFrame = new JFrame("Expanded DataGrid View");
+                expandFrame.setSize(1000, 600);
+                JTable expandedTable = new JTable(tableModel);
+                expandFrame.add(new JScrollPane(expandedTable));
+                expandFrame.setVisible(true);
             }
         });
 
@@ -235,13 +260,16 @@ public class SuperieurDashboard {
                 titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
                 descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
                 String agentName = taskTable.getValueAt(selectedRow, 3).toString();
-                budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
-
-                String departmentName = getDepartmentNameByAgent(agentName);
-                departmentComboBox.setSelectedItem(departmentName);
-                loadAgents(departmentComboBox, agentComboBox);
                 agentComboBox.setSelectedItem(agentName);
+                budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
+                supField.setText(superieurFullName);
             }
+            
+            clearButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
+            }
+            });
         });
     }
 
