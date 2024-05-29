@@ -36,7 +36,7 @@ public class CreateAccountForm extends JDialog {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel loginLabel = new JLabel("Nom d'utilisateur:");
+        JLabel loginLabel = new JLabel("Num user:");
         gbc.gridx = 0;
         gbc.gridy = 0;
         formPanel.add(loginLabel, gbc);
@@ -153,7 +153,7 @@ public class CreateAccountForm extends JDialog {
 
                     // Display entered data in a dialog
                     JOptionPane.showMessageDialog(CreateAccountForm.this,
-                            "Nom d'utilisateur: " + login + "\nMot de passe: " + password + "\nNom complet: " + fullName +
+                            "Num user: " + login + "\nMot de passe: " + password + "\nNom complet: " + fullName +
                                     "\nPoste: " + position + "\nDépartement: " + department + "\nEmail: " + email + "\nNuméro de téléphone: " + phone + "\nCompte: " + role,
                             "Compte créé", JOptionPane.INFORMATION_MESSAGE);
 

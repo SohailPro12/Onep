@@ -41,29 +41,29 @@ public class AgentDashboard extends JFrame {
         }
     }
 
- private void insertCommentIntoDatabase(int taskId, String comment, String progression, String agent) {
-    // Calculate numeric progression based on the progression label
-    int numericProgression = calculateProgression(progression);
+    // Method to update comment in the database
+    private void updateCommentInDatabase(int taskId, String comment, String progression, String agent) {
+        int numericProgression = calculateProgression(progression);
 
-    String query = "UPDATE commentaires SET comment=?, progression=?, Agent=? WHERE id_Tache=?";
-    try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
-         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-        preparedStatement.setString(1, comment);
-        preparedStatement.setInt(2, numericProgression); // Insert numeric progression
-        preparedStatement.setString(3, agent);
-        preparedStatement.setInt(4, taskId);
-        
-        int rowsUpdated = preparedStatement.executeUpdate();
-        if (rowsUpdated > 0) {
-            JOptionPane.showMessageDialog(this, "Comment updated successfully!");
-        } else {
-            JOptionPane.showMessageDialog(this, "No comment found with id " + taskId, "Update Error", JOptionPane.ERROR_MESSAGE);
+        String query = "UPDATE commentaires SET comment=?, progression=?, Agent=? WHERE Id_Tache=?";
+        try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, comment);
+            preparedStatement.setInt(2, numericProgression);
+            preparedStatement.setString(3, agent);
+            preparedStatement.setInt(4, taskId);
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated > 0) {
+                JOptionPane.showMessageDialog(this, "Comment updated successfully!");
+            } else {
+                JOptionPane.showMessageDialog(this, "No comment found with id " + taskId, "Update Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error updating comment in database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error updating comment in database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
     }
-}
 
     // Method to calculate numeric progression based on the progression label
     private int calculateProgression(String progressionLabel) {
@@ -144,13 +144,17 @@ public class AgentDashboard extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = taskTable.getSelectedRow();
                 if (selectedRow != -1) {
-                    String taskId = taskTable.getValueAt(selectedRow, 0).toString();
+                    int taskId = Integer.parseInt(taskTable.getValueAt(selectedRow, 0).toString());
                     String title = taskTable.getValueAt(selectedRow, 1).toString();
                     String description = taskTable.getValueAt(selectedRow, 2).toString();
                     String superieur = taskTable.getValueAt(selectedRow, 3).toString();
-                    String comment = commentField.getText();
-                    String progression = progressionComboBox.getSelectedItem().toString();
-                    JOptionPane.showMessageDialog(null, "Modify Task ID: " + taskId + "\nTitle: " + title + "\nDescription: " + description + "\nSuperieur: " + superieur + "\nComment: " + comment + "\nProgression: " + progression);
+
+                    // Retrieve current comment and progression from database
+                    String currentComment = ""; // Implement method to fetch current comment
+                    String currentProgression = ""; // Implement method to fetch current progression
+
+                    commentField.setText(currentComment);
+                    progressionComboBox.setSelectedItem(currentProgression);
                 } else {
                     JOptionPane.showMessageDialog(null, "Please select a task to modify.");
                 }
@@ -159,7 +163,7 @@ public class AgentDashboard extends JFrame {
         buttonsSubPanel.add(modifierButton);
 
         // Send Comment button
-        JButton sendCommentButton = new JButton("Send Comment");
+        JButton sendCommentButton = new JButton("Send");
         sendCommentButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = taskTable.getSelectedRow();
@@ -167,7 +171,7 @@ public class AgentDashboard extends JFrame {
                     int taskId = Integer.parseInt(taskTable.getValueAt(selectedRow, 0).toString());
                     String comment = commentField.getText();
                     String progression = progressionComboBox.getSelectedItem().toString();
-                    insertCommentIntoDatabase(taskId, comment, progression, username);
+                    updateCommentInDatabase(taskId, comment, progression, username);
                 } else {
                     JOptionPane.showMessageDialog(null, "Please select a task to comment on.");
                 }

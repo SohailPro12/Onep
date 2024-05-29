@@ -97,6 +97,7 @@ public class UserLoginForm {
                 stmt.setString(3, username);
                 stmt.setString(4, password);
                 ResultSet rs = stmt.executeQuery();
+                //System.out.println(rs.next());
                 return rs.next();
             }
         } catch (SQLException e) {
