@@ -94,7 +94,7 @@ public class AgentDashboard extends JFrame {
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
-        // Table setup
+        // Table setupihih
         String[] columnNames = {"Task ID", "Title", "Description", "Superieur"};
         Object[][] data = getTaskDataFromDatabase();
 
