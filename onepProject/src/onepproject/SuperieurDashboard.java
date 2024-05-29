@@ -5,6 +5,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.*;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -21,7 +23,7 @@ public class SuperieurDashboard {
     public static void showSuperieurDashboard(JFrame parentFrame, String username) {
         JFrame dashboardFrame = new JFrame("Superieur Dashboard");
         dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dashboardFrame.setSize(1000, 600);
+        dashboardFrame.setSize(1200, 800);
         dashboardFrame.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -31,7 +33,9 @@ public class SuperieurDashboard {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        dashboardFrame.add(new JLabel("Task Form"), gbc);
+        JLabel taskFormLabel = new JLabel("Task Form");
+        taskFormLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        dashboardFrame.add(taskFormLabel, gbc);
 
         gbc.gridwidth = 1;
         gbc.gridx = 0;
@@ -89,40 +93,36 @@ public class SuperieurDashboard {
         gbc.gridx = 0;
         gbc.gridy = 7;
         dashboardFrame.add(new JLabel("Superieur:"), gbc);
+
         gbc.gridx = 1;
         JTextField supField = new JTextField(15);
         dashboardFrame.add(supField, gbc);
 
-        // Task buttons
+        // Task buttons in one line
         gbc.gridx = 0;
         gbc.gridy = 8;
+        gbc.gridwidth = 2;
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JButton addButton = new JButton("Ajouter");
-        dashboardFrame.add(addButton, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 8;
         JButton deleteButton = new JButton("Supprimer");
-        dashboardFrame.add(deleteButton, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 9;
         JButton modifyButton = new JButton("Modifier");
-        dashboardFrame.add(modifyButton, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 9;
         JButton searchButton = new JButton("Chercher");
-        dashboardFrame.add(searchButton, gbc);
+        buttonPanel.add(addButton);
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(modifyButton);
+        buttonPanel.add(searchButton);
+        dashboardFrame.add(buttonPanel, gbc);
 
         gbc.gridx = 2;
-gbc.gridy = 0;
-gbc.gridheight = 10;
-gbc.gridwidth = 3;
-String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"}; // Add Comment and Progression columns
-DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-JTable taskTable = new JTable(tableModel);
-JScrollPane scrollPane = new JScrollPane(taskTable);
-dashboardFrame.add(scrollPane, gbc);
+        gbc.gridy = 0;
+        gbc.gridheight = 10;
+        gbc.gridwidth = 3;
+        String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable taskTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(taskTable);
+        dashboardFrame.add(scrollPane, gbc);
 
         // Other buttons
         gbc.gridx = 5;
@@ -137,18 +137,31 @@ dashboardFrame.add(scrollPane, gbc);
         JButton statsButton = new JButton("Statistiques");
         dashboardFrame.add(statsButton, gbc);
 
+        // Search by Task ID
         gbc.gridx = 5;
         gbc.gridy = 2;
-        JLabel searchLabel = new JLabel("Search by Task ID or Agent Name:");
+        JLabel searchLabel = new JLabel("Search by Task ID:");
         dashboardFrame.add(searchLabel, gbc);
 
         gbc.gridx = 5;
         gbc.gridy = 3;
         JTextField searchBar = new JTextField(15);
         dashboardFrame.add(searchBar, gbc);
-        // View Credentials button
+
+        // Search by Agent Name
         gbc.gridx = 5;
         gbc.gridy = 4;
+        JLabel searchAgentLabel = new JLabel("Search by Agent Name:");
+        dashboardFrame.add(searchAgentLabel, gbc);
+
+        gbc.gridx = 5;
+        gbc.gridy = 5;
+        JTextField searchAgentBar = new JTextField(15);
+        dashboardFrame.add(searchAgentBar, gbc);
+
+        // View Credentials button
+        gbc.gridx = 5;
+        gbc.gridy = 6;
         JButton viewCredentialsButton = new JButton("View Credentials");
         dashboardFrame.add(viewCredentialsButton, gbc);
 
@@ -157,7 +170,6 @@ dashboardFrame.add(scrollPane, gbc);
                 showCredentialsView();
             }
         });
-
 
         dashboardFrame.setVisible(true);
 
@@ -172,28 +184,27 @@ dashboardFrame.add(scrollPane, gbc);
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addTask(titleField, descriptionField, agentComboBox, budgetField, supField, tableModel, taskIdField);
-           resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
+                resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
             }
         });
 
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 deleteTask(taskTable, tableModel);
-            resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
+                resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
             }
         });
 
         modifyButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 modifyTask(taskTable, titleField, descriptionField, agentComboBox, budgetField, tableModel);
-           resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
+                resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
             }
         });
 
         searchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                searchTasks(searchBar, tableModel);
-            
+                searchTasksById(searchBar, tableModel);
             }
         });
 
@@ -210,34 +221,35 @@ dashboardFrame.add(scrollPane, gbc);
             }
         });
 
-       taskTable.getSelectionModel().addListSelectionListener(event -> {
-    if (!event.getValueIsAdjusting() && taskTable.getSelectedRow() != -1) {
-        int selectedRow = taskTable.getSelectedRow();
-        taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
-        titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
-        descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
-        String agentName = taskTable.getValueAt(selectedRow, 3).toString();
-        budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
+        searchAgentBar.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                searchTasksByAgentName(searchAgentBar, tableModel);
+            }
+        });
 
-        // Get department name based on agent name
-        String departmentName = getDepartmentNameByAgent(agentName);
-        departmentComboBox.setSelectedItem(departmentName);
+        taskTable.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting() && taskTable.getSelectedRow() != -1) {
+                int selectedRow = taskTable.getSelectedRow();
+                taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
+                titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
+                descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
+                String agentName = taskTable.getValueAt(selectedRow, 3).toString();
+                budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
 
-        // Load agents for the selected department and set the selected agent
-        loadAgents(departmentComboBox, agentComboBox);
-        agentComboBox.setSelectedItem(agentName);
-    }
-    
-
-});
-
+                String departmentName = getDepartmentNameByAgent(agentName);
+                departmentComboBox.setSelectedItem(departmentName);
+                loadAgents(departmentComboBox, agentComboBox);
+                agentComboBox.setSelectedItem(agentName);
+            }
+        });
     }
 
     private static void loadDepartments(JComboBox<String> departmentComboBox) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT libelle FROM department";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery();
+            try (PreparedStatement stmt = conn.prepareStatement(query);
+                 ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     departmentComboBox.addItem(rs.getString("libelle"));
                 }
@@ -246,20 +258,8 @@ dashboardFrame.add(scrollPane, gbc);
             e.printStackTrace();
         }
     }
-    private static void resetFields(JTextField taskIdField, JTextField titleField, JTextField descriptionField,
-                                JComboBox<String> departmentComboBox, JComboBox<String> agentComboBox, JTextField budgetField, JTextField supField) {
-    taskIdField.setText("");
-    titleField.setText("");
-    descriptionField.setText("");
-    departmentComboBox.setSelectedIndex(-1);  // Reset the department combo box
-    agentComboBox.removeAllItems();  // Clear agent combo box
-    budgetField.setText("");
 
-     taskIdField.setText(getNextTaskId());
-}
-
-
-    private static void loadAgents(JComboBox<String> departmentComboBox, JComboBox<String> agentComboBox) {
+  private static void loadAgents(JComboBox<String> departmentComboBox, JComboBox<String> agentComboBox) {
     agentComboBox.removeAllItems();
     String selectedDepartmentName = (String) departmentComboBox.getSelectedItem();
     int departmentId = getDepartmentId(selectedDepartmentName);
@@ -304,25 +304,39 @@ private static int getDepartmentId(String departmentName) {
     return departmentId;
 }
 
-
     private static String getNextTaskId() {
-        String nextId = "";
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "SELECT MAX(id) FROM tache";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                ResultSet rs = stmt.executeQuery();
+            String query = "SELECT MAX(id) From Tache";
+            try (PreparedStatement stmt = conn.prepareStatement(query);
+                 ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    int maxId = rs.getInt(1);
-                    nextId = String.valueOf(maxId + 1);
+                    return String.valueOf(rs.getInt(1) + 1);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return nextId;
+        return "1";
     }
 
-   private static void loadTasks(DefaultTableModel tableModel) {
+    private static String getSuperieurFullName(String username) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "SELECT NomComplete FROM superieur WHERE login = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("NomComplete");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+  private static void loadTasks(DefaultTableModel tableModel) {
     tableModel.setRowCount(0); // Clear the table
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
         String query = "SELECT t.id, Titre, t.Description, t.Agent, budget, c.comment as commentaires, c.progression FROM tache t, commentaires c where t.id = c.Id_Tache";
@@ -356,7 +370,7 @@ private static int getDepartmentId(String departmentName) {
         String sup = supField.getText();
 
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "INSERT INTO tache (id ,Titre, Description, Agent, budget, sup) VALUES (?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO tache (id ,Titre, Description, Agent, budget, superieur) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, id);
                 stmt.setString(2, title);
@@ -396,7 +410,7 @@ private static int getDepartmentId(String departmentName) {
                     
                 }
                 String query2 = "DELETE FROM commentaires WHERE id_tache = ?";
-                try (PreparedStatement stmt = conn.prepareStatement(query2)) {
+                try (PreparedStatement stmt = conn.prepareStatement(query)) {
                     stmt.setInt(1, taskId);
                     stmt.executeUpdate();
                     
@@ -437,27 +451,30 @@ private static int getDepartmentId(String departmentName) {
         }
     }
 
-    private static void searchTasks(JTextField searchBar, DefaultTableModel tableModel) {
-        String searchQuery = searchBar.getText();
+    private static void searchTasksById(JTextField searchBar, DefaultTableModel tableModel) {
+       String searchQuery = searchBar.getText();
         if (!searchQuery.isEmpty()) {
             tableModel.setRowCount(0); // Clear the table
             try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-                String query = "SELECT id, Titre, Description, Agent, budget FROM tache WHERE id = ? OR Agent LIKE ?";
+                String query = "SELECT t.id, Titre, t.Description, t.Agent, budget, c.comment as commentaires, c.progression FROM tache t, commentaires c where t.id = c.Id_Tache AND t.id = ?";
                 try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                    stmt.setString(1, searchQuery);
-                    stmt.setString(2, "%" + searchQuery + "%");
-                    ResultSet rs = stmt.executeQuery();
+                stmt.setString(1, searchQuery);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    tableModel.setRowCount(0);
                     while (rs.next()) {
                         Object[] row = {
                                 rs.getInt("id"),
                                 rs.getString("Titre"),
-                                rs.getString("Description"),
-                                rs.getString("Agent"),
-                                rs.getInt("budget")
+                                rs.getString("description"),
+                                rs.getString("agent"),
+                                rs.getDouble("budget"),
+                                rs.getString("commentaires"),
+                                rs.getString("progression")
                         };
                         tableModel.addRow(row);
                     }
                 }
+            }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -465,7 +482,49 @@ private static int getDepartmentId(String departmentName) {
             loadTasks(tableModel); // Reload all tasks if search bar is empty
         }
     }
-    private static String getDepartmentNameByAgent(String agentName) {
+
+    private static void searchTasksByAgentName(JTextField searchAgentBar, DefaultTableModel tableModel) {
+        String searchText = searchAgentBar.getText();
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "SELECT t.id, Titre, t.Description, t.Agent, budget, c.comment as commentaires, c.progression FROM tache t, commentaires c where t.id = c.Id_Tache AND t.Agent LIKE ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, "%" + searchText + "%");
+                try (ResultSet rs = stmt.executeQuery()) {
+                    tableModel.setRowCount(0);
+                    while (rs.next()) {
+                        Object[] row = {
+                                rs.getInt("id"),
+                                rs.getString("Titre"),
+                                rs.getString("description"),
+                                rs.getString("agent"),
+                                rs.getDouble("budget"),
+                                rs.getString("commentaires"),
+                                rs.getString("progression")
+                        };
+                        tableModel.addRow(row);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    private static void resetFields(JTextField taskIdField, JTextField titleField, JTextField descriptionField,
+                                    JComboBox<String> departmentComboBox, JComboBox<String> agentComboBox, JTextField budgetField, JTextField supField) {
+        taskIdField.setText(getNextTaskId());
+        titleField.setText("");
+        descriptionField.setText("");
+        departmentComboBox.setSelectedIndex(-1);
+        agentComboBox.removeAllItems();
+        budgetField.setText("");
+        supField.setText(superieurFullName);
+    }
+    
+    
+     private static String getDepartmentNameByAgent(String agentName) {
     String departmentName = "";
     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
         String query = "SELECT d.libelle FROM department d JOIN agent a ON d.id = a.Departement WHERE a.NomComplete = ? UNION SELECT d.libelle FROM department d JOIN superieur s ON d.id = s.Departement WHERE s.NomComplete = ?";
@@ -482,27 +541,10 @@ private static int getDepartmentId(String departmentName) {
     }
     return departmentName;
 }
-
-
-
-    private static String getSuperieurFullName(String username) {
-        String fullName = "";
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "SELECT NomComplete FROM superieur WHERE login = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, username);
-                ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    fullName = rs.getString("NomComplete");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return fullName;
-    }
-
- private static void showStatistics() {
+     
+     
+     
+   private static void showStatistics() {
         JFrame statsFrame = new JFrame("Task Progression Statistics");
         statsFrame.setSize(800, 600);
         statsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

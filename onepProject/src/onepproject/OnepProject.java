@@ -5,8 +5,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import javax.imageio.ImageIO;
 
 public class OnepProject {
@@ -58,10 +58,11 @@ public class OnepProject {
         headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
         headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Load and scale logo
+        // Load and scale logo from the internet
         BufferedImage originalLogo = null;
         try {
-            originalLogo = ImageIO.read(new File("C:\\Users\\LENOVO\\Documents\\NetBeansProjects\\Onep\\onepProject\\src\\images\\WhatsApp Image 2024-05-28 à 18.39.20_1d42cc15.jpg"));
+            URL url = new URL("https://fv5-2.failiem.lv/thumb_show.php?i=5pmjxwjabf&view&v=1");
+                    originalLogo = ImageIO.read(url);
         } catch (IOException e) {
             e.printStackTrace();
         }
