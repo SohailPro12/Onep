@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.net.URL;
 
 public class UserLoginForm {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/onep_db";
@@ -20,32 +21,61 @@ public class UserLoginForm {
         userFrame.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(20, 20, 20, 20);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridx = 0;
+        // Add image
+try {
+    URL imageUrl = new URL("https://i.ibb.co/YXyW9Zt/Onep-svg.png");
+    ImageIcon originalIcon = new ImageIcon(imageUrl);
+    
+    // Get the width and height of the original image
+    int originalWidth = originalIcon.getIconWidth();
+    int originalHeight = originalIcon.getIconHeight();
+    
+    // Calculate the width and height to fit the left part of the frame
+    int targetWidth = 300; // Adjust this as needed
+    int targetHeight = (int) Math.round((double) targetWidth / originalWidth * originalHeight);
+    
+    // Resize the image to fit the target dimensions
+    ImageIcon resizedIcon = new ImageIcon(originalIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT));
+
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.gridheight = GridBagConstraints.REMAINDER; // Span the entire height
+    gbc.gridwidth = 1; // Only occupy one column
+    JLabel imageLabel = new JLabel(resizedIcon);
+    userFrame.add(imageLabel, gbc);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+
+
+        gbc.gridheight = 1;
+        gbc.gridx = 1;
         gbc.gridy = 0;
         userFrame.add(new JLabel("User Username:"), gbc);
 
-        gbc.gridx = 1;
-        JTextField userUsername = new JTextField(15);
+        gbc.gridx = 2;
+        JTextField userUsername = new JTextField(20);
+        userUsername.setFont(new Font("Arial", Font.PLAIN, 18));
         userFrame.add(userUsername, gbc);
 
-        gbc.gridx = 0;
+        gbc.gridx = 1;
         gbc.gridy = 1;
         userFrame.add(new JLabel("User Password:"), gbc);
 
-        gbc.gridx = 1;
-        JPasswordField userPassword = new JPasswordField(15);
+        gbc.gridx = 2;
+        JPasswordField userPassword = new JPasswordField(20);
+        userPassword.setFont(new Font("Arial", Font.PLAIN, 18));
         userFrame.add(userPassword, gbc);
 
-        gbc.gridx = 1;
+        gbc.gridx = 2;
         gbc.gridy = 2;
         JButton userLoginButton = new JButton("Login");
         styleButton(userLoginButton);
         userFrame.add(userLoginButton, gbc);
 
-        gbc.gridx = 1;
         gbc.gridy = 3;
         JButton forgotPasswordButton = new JButton("Forgot Password");
         styleButton(forgotPasswordButton);
@@ -53,7 +83,6 @@ public class UserLoginForm {
 
         JLabel messageLabel = new JLabel("");
         messageLabel.setForeground(Color.RED);
-        gbc.gridx = 1;
         gbc.gridy = 4;
         userFrame.add(messageLabel, gbc);
 
@@ -97,7 +126,6 @@ public class UserLoginForm {
                 stmt.setString(3, username);
                 stmt.setString(4, password);
                 ResultSet rs = stmt.executeQuery();
-                //System.out.println(rs.next());
                 return rs.next();
             }
         } catch (SQLException e) {
@@ -151,7 +179,8 @@ public class UserLoginForm {
         forgotPasswordFrame.add(new JLabel("Username:"), gbc);
 
         gbc.gridx = 1;
-        JTextField usernameField = new JTextField(15);
+        JTextField usernameField = new JTextField(20);
+        usernameField.setFont(new Font("Arial", Font.PLAIN, 18));
         forgotPasswordFrame.add(usernameField, gbc);
 
         gbc.gridx = 0;
@@ -159,7 +188,8 @@ public class UserLoginForm {
         forgotPasswordFrame.add(new JLabel("Email:"), gbc);
 
         gbc.gridx = 1;
-        JTextField emailField = new JTextField(15);
+        JTextField emailField = new JTextField(20);
+        emailField.setFont(new Font("Arial", Font.PLAIN, 18));
         forgotPasswordFrame.add(emailField, gbc);
 
         gbc.gridx = 0;
@@ -167,7 +197,8 @@ public class UserLoginForm {
         forgotPasswordFrame.add(new JLabel("Telephone Number:"), gbc);
 
         gbc.gridx = 1;
-        JTextField phoneField = new JTextField(15);
+        JTextField phoneField = new JTextField(20);
+        phoneField.setFont(new Font("Arial", Font.PLAIN, 18));
         forgotPasswordFrame.add(phoneField, gbc);
 
         gbc.gridx = 1;
@@ -257,7 +288,8 @@ public class UserLoginForm {
         recoveryCodeFrame.add(new JLabel("Username:"), gbc);
 
         gbc.gridx = 1;
-        JTextField usernameField = new JTextField(15);
+        JTextField usernameField = new JTextField(20);
+        usernameField.setFont(new Font("Arial", Font.PLAIN, 18));
         recoveryCodeFrame.add(usernameField, gbc);
 
         gbc.gridx = 0;
@@ -265,7 +297,8 @@ public class UserLoginForm {
         recoveryCodeFrame.add(new JLabel("Recovery Code:"), gbc);
 
         gbc.gridx = 1;
-        JTextField codeField = new JTextField(15);
+        JTextField codeField = new JTextField(20);
+        codeField.setFont(new Font("Arial", Font.PLAIN, 18));
         recoveryCodeFrame.add(codeField, gbc);
 
         gbc.gridx = 1;
@@ -336,7 +369,8 @@ public class UserLoginForm {
         resetPasswordFrame.add(new JLabel("New Password:"), gbc);
 
         gbc.gridx = 1;
-        JPasswordField newPasswordField = new JPasswordField(15);
+        JPasswordField newPasswordField = new JPasswordField(20);
+        newPasswordField.setFont(new Font("Arial", Font.PLAIN, 18));
         resetPasswordFrame.add(newPasswordField, gbc);
 
         gbc.gridx = 0;
@@ -344,7 +378,8 @@ public class UserLoginForm {
         resetPasswordFrame.add(new JLabel("Confirm Password:"), gbc);
 
         gbc.gridx = 1;
-        JPasswordField confirmPasswordField = new JPasswordField(15);
+        JPasswordField confirmPasswordField = new JPasswordField(20);
+        confirmPasswordField.setFont(new Font("Arial", Font.PLAIN, 18));
         resetPasswordFrame.add(confirmPasswordField, gbc);
 
         gbc.gridx = 1;
@@ -406,9 +441,10 @@ public class UserLoginForm {
     }
 
     private static void styleButton(JButton button) {
-        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setFont(new Font("Arial", Font.BOLD, 16));
         button.setBackground(new Color(70, 130, 180));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(200, 40));
     }
 }

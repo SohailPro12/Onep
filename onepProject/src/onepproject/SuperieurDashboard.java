@@ -24,20 +24,20 @@ public class SuperieurDashboard {
     public static void showSuperieurDashboard(JFrame parentFrame, String username) {
         JFrame dashboardFrame = new JFrame("Superieur Dashboard");
         dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dashboardFrame.setSize(1200, 800);
-        
+        dashboardFrame.setSize(1000, 800);
+
         dashboardFrame.setLocationRelativeTo(null);
         dashboardFrame.setResizable(false); // Disable resizing
         dashboardFrame.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Task Form
+        // Task Form Label
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.WEST;
         JLabel taskFormLabel = new JLabel("Task Form");
         taskFormLabel.setFont(new Font("Arial", Font.BOLD, 20));
         dashboardFrame.add(taskFormLabel, gbc);
@@ -124,6 +124,7 @@ public class SuperieurDashboard {
         gbc.gridy = 0;
         gbc.gridheight = 10;
         gbc.gridwidth = 3;
+        gbc.fill = GridBagConstraints.BOTH;
         String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable taskTable = new JTable(tableModel);
@@ -141,7 +142,6 @@ public class SuperieurDashboard {
         // Search by Task ID
         gbc.gridx = 2;
         gbc.gridy = 11;
-        gbc.gridheight = 1;
         gbc.gridwidth = 1;
         JLabel searchLabel = new JLabel("Search by Task ID:");
         dashboardFrame.add(searchLabel, gbc);
@@ -254,22 +254,22 @@ public class SuperieurDashboard {
         });
 
         taskTable.getSelectionModel().addListSelectionListener(event -> {
-            if (!event.getValueIsAdjusting() && taskTable.getSelectedRow() != -1) {
+            if (!event.getValueIsAdjusting()) {
                 int selectedRow = taskTable.getSelectedRow();
-                taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
-                titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
-                descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
-                String agentName = taskTable.getValueAt(selectedRow, 3).toString();
-                agentComboBox.setSelectedItem(agentName);
-                budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
-                supField.setText(superieurFullName);
+                if (selectedRow != -1) {
+                    taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
+                    titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
+                    descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
+                    agentComboBox.setSelectedItem(taskTable.getValueAt(selectedRow, 3).toString());
+                    budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
+                }
             }
-            
-            clearButton.addActionListener(new ActionListener() {
+        });
+
+        clearButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
             }
-            });
         });
     }
 
@@ -552,23 +552,7 @@ private static int getDepartmentId(String departmentName) {
     }
     
     
-     private static String getDepartmentNameByAgent(String agentName) {
-    String departmentName = "";
-    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-        String query = "SELECT d.libelle FROM department d JOIN agent a ON d.id = a.Departement WHERE a.NomComplete = ? UNION SELECT d.libelle FROM department d JOIN superieur s ON d.id = s.Departement WHERE s.NomComplete = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, agentName);
-            stmt.setString(2, agentName);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                departmentName = rs.getString("libelle");
-            }
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    return departmentName;
-}
+ 
      
      
      
