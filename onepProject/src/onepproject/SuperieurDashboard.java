@@ -34,12 +34,16 @@ public class SuperieurDashboard {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Setting background color
+        dashboardFrame.getContentPane().setBackground(new Color(240, 240, 240));
+
         // Task Form Label
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         JLabel taskFormLabel = new JLabel("Task Form");
         taskFormLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        taskFormLabel.setForeground(new Color(0, 102, 204));
         dashboardFrame.add(taskFormLabel, gbc);
 
         gbc.gridwidth = 1;
@@ -128,6 +132,9 @@ public class SuperieurDashboard {
         String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable taskTable = new JTable(tableModel);
+        taskTable.setBackground(new Color(255, 255, 204));
+        taskTable.setGridColor(new Color(102, 178, 255));
+        taskTable.setSelectionBackground(new Color(255, 204, 153));
         JScrollPane scrollPane = new JScrollPane(taskTable);
         dashboardFrame.add(scrollPane, gbc);
 
@@ -249,6 +256,10 @@ public class SuperieurDashboard {
                 expandFrame.setSize(1000, 600);
                 JTable expandedTable = new JTable(tableModel);
                 expandFrame.add(new JScrollPane(expandedTable));
+                
+        expandedTable.setBackground(new Color(255, 255, 204));
+        expandedTable.setGridColor(new Color(102, 178, 255));
+        expandedTable.setSelectionBackground(new Color(255, 204, 153));
                 expandFrame.setVisible(true);
             }
         });
@@ -272,7 +283,6 @@ public class SuperieurDashboard {
             }
         });
     }
-
     private static void loadDepartments(JComboBox<String> departmentComboBox) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT libelle FROM department";
