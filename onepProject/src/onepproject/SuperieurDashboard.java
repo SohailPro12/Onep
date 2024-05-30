@@ -24,7 +24,7 @@ public class SuperieurDashboard {
     public static void showSuperieurDashboard(JFrame parentFrame, String username) {
         JFrame dashboardFrame = new JFrame("Superieur Dashboard");
         dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dashboardFrame.setSize(1000, 600);
+        dashboardFrame.setSize(1000, 800);
 
         dashboardFrame.setLocationRelativeTo(null);
         dashboardFrame.setResizable(false); // Disable resizing
@@ -146,6 +146,36 @@ public class SuperieurDashboard {
         JButton expandButton = new JButton("Expand");
         dashboardFrame.add(expandButton, gbc);
 
+        // Detailed information area
+        gbc.gridx = 0;
+        gbc.gridy = 9;
+        gbc.gridwidth = 2;
+        JLabel detailLabel = new JLabel("Commentaire:");
+        dashboardFrame.add(detailLabel, gbc);
+
+        gbc.gridy = 10;
+        gbc.gridheight = 2;
+        JTextArea detailArea = new JTextArea(5, 20);
+        detailArea.setLineWrap(true);
+        detailArea.setWrapStyleWord(true);
+        detailArea.setEditable(false);
+        JScrollPane detailScrollPane = new JScrollPane(detailArea);
+        dashboardFrame.add(detailScrollPane, gbc);
+
+        // Response field
+        gbc.gridy = 12;
+        gbc.gridheight = 1;
+        dashboardFrame.add(new JLabel("Response:"), gbc);
+
+        gbc.gridy = 13;
+        JTextField responseField = new JTextField(20);
+        dashboardFrame.add(responseField, gbc);
+
+        // Button to save the response
+        gbc.gridy = 14;
+        gbc.gridwidth = 1;
+        JButton saveResponseButton = new JButton("Save Response");
+        dashboardFrame.add(saveResponseButton, gbc);
         // Search by Task ID
         gbc.gridx = 2;
         gbc.gridy = 11;
@@ -250,6 +280,29 @@ public class SuperieurDashboard {
             }
         });
 
+        saveResponseButton.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent e) {
+        int selectedRow = taskTable.getSelectedRow();
+        if (selectedRow != -1) {
+            int taskId = (int) taskTable.getValueAt(selectedRow, 0);
+            String response = responseField.getText();
+
+            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+                String query = "UPDATE commentaires SET reponse = ? WHERE Id_Tache = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                    stmt.setString(1, response);
+                    stmt.setInt(2, taskId);
+                    stmt.executeUpdate();
+                }
+                
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+});
+
+        
         expandButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFrame expandFrame = new JFrame("Expanded DataGrid View");
@@ -264,18 +317,28 @@ public class SuperieurDashboard {
             }
         });
 
-        taskTable.getSelectionModel().addListSelectionListener(event -> {
-            if (!event.getValueIsAdjusting()) {
-                int selectedRow = taskTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
-                    titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
-                    descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
-                    agentComboBox.setSelectedItem(taskTable.getValueAt(selectedRow, 3).toString());
-                    budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
-                }
-            }
-        });
+      taskTable.getSelectionModel().addListSelectionListener(event -> {
+    if (!event.getValueIsAdjusting() && taskTable.getSelectedRow() != -1) {
+        int selectedRow = taskTable.getSelectedRow();
+        taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
+        titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
+        descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
+        String agentName = taskTable.getValueAt(selectedRow, 3).toString();
+        budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
+
+        // Get department name based on agent name
+        String departmentName = getDepartmentNameByAgent(agentName);
+        System.out.println(agentName);
+        departmentComboBox.setSelectedItem(departmentName);
+
+        // Load agents for the selected department and set the selected agent
+        loadAgents(departmentComboBox, agentComboBox);
+        agentComboBox.setSelectedItem(agentName);
+        
+           detailArea.setText(taskTable.getValueAt(selectedRow, 5).toString());
+                    responseField.setText("");
+    }});
+              
 
         clearButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -283,6 +346,9 @@ public class SuperieurDashboard {
             }
         });
     }
+    
+    
+    
     private static void loadDepartments(JComboBox<String> departmentComboBox) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
             String query = "SELECT libelle FROM department";
@@ -297,6 +363,25 @@ public class SuperieurDashboard {
         }
     }
 
+    private static String getDepartmentNameByAgent(String agentName) {
+    String departmentName = "";
+      
+    
+     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "SELECT d.libelle FROM department d JOIN agent a ON d.id = a.Departement WHERE a.NomComplete = ? UNION SELECT d.libelle FROM department d JOIN superieur s ON d.id = s.Departement WHERE s.NomComplete = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, agentName);
+                stmt.setString(2, agentName);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    departmentName = rs.getString("libelle");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return departmentName;
+}
   private static void loadAgents(JComboBox<String> departmentComboBox, JComboBox<String> agentComboBox) {
     agentComboBox.removeAllItems();
     String selectedDepartmentName = (String) departmentComboBox.getSelectedItem();
