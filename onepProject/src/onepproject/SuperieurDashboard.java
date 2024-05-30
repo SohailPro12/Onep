@@ -24,7 +24,7 @@ public class SuperieurDashboard {
     public static void showSuperieurDashboard(JFrame parentFrame, String username) {
         JFrame dashboardFrame = new JFrame("Superieur Dashboard");
         dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dashboardFrame.setSize(1000, 800);
+        dashboardFrame.setSize(1000, 600);
 
         dashboardFrame.setLocationRelativeTo(null);
         dashboardFrame.setResizable(false); // Disable resizing
@@ -123,7 +123,7 @@ public class SuperieurDashboard {
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridheight = 10;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 10;
         gbc.fill = GridBagConstraints.BOTH;
         String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);

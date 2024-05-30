@@ -23,7 +23,7 @@ public class CreateAccountForm extends JDialog {
 
     public CreateAccountForm(JFrame parentFrame) {
         super(parentFrame, "Create Account", true);
-        setSize(450, 500);
+        setSize(1000, 600);
         setLocationRelativeTo(parentFrame);
         setLayout(new BorderLayout(10, 10));
         setResizable(false);

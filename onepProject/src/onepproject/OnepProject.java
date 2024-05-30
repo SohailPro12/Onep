@@ -14,7 +14,7 @@ public class OnepProject {
         // Create the main frame
         JFrame mainFrame = new JFrame("Main Form");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(1000, 500); // Set the fixed size
+        mainFrame.setSize(1000, 600); // Set the fixed size
         mainFrame.setLocationRelativeTo(null); // Center the window
         mainFrame.setResizable(false); // Disable resizing
         mainFrame.setLayout(new BorderLayout());

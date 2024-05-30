@@ -16,7 +16,7 @@ public class AdminDashboard {
     public static void showAdminDashboard(JFrame parentFrame) {
         JFrame adminDashboardFrame = new JFrame("Admin Dashboard");
         adminDashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        adminDashboardFrame.setSize(800, 400);
+        adminDashboardFrame.setSize(1000, 600);
         adminDashboardFrame.setLayout(new BorderLayout());
 
         JLabel titleLabel = new JLabel("Demande de récupération", JLabel.CENTER);
