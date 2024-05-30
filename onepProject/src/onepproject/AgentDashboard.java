@@ -16,7 +16,7 @@ public class AgentDashboard extends JFrame {
     private JLabel taskIdValueLabel;
     private JTextField commentField;
     private JComboBox<String> progressionComboBox;
-    private JTextField taskIdSearchField;
+    private JTextField taskTitleSearchField;
     private JTable taskTable;
 
     private Color backgroundColor = new Color(245, 245, 245); // Light gray
@@ -30,7 +30,7 @@ public class AgentDashboard extends JFrame {
     private Font buttonFont = new Font("Arial", Font.BOLD, 12);
 
     private Object[][] getTaskDataFromDatabase() {
-        String query = "SELECT id, Titre, Description, superieur FROM tache";
+        String query = "SELECT tache.id, Titre, Description, superieur, commentaires.comment FROM tache LEFT JOIN commentaires ON tache.id = commentaires.Id_Tache";
         try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
              Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
              ResultSet resultSet = statement.executeQuery(query)) {
@@ -39,13 +39,14 @@ public class AgentDashboard extends JFrame {
             int rowCount = resultSet.getRow();
             resultSet.beforeFirst();
 
-            Object[][] data = new Object[rowCount][4]; // 4 columns in the table
+            Object[][] data = new Object[rowCount][5]; // 5 columns in the table
             int row = 0;
             while (resultSet.next()) {
                 data[row][0] = resultSet.getInt("id");
                 data[row][1] = resultSet.getString("Titre");
                 data[row][2] = resultSet.getString("Description");
                 data[row][3] = resultSet.getString("superieur");
+                data[row][4] = resultSet.getString("comment");
                 row++;
             }
             return data;
@@ -105,12 +106,12 @@ public class AgentDashboard extends JFrame {
 
             int rowsUpdated = preparedStatement.executeUpdate();
             if (rowsUpdated > 0) {
-                JOptionPane.showMessageDialog(this, " updated successfully!");
+                JOptionPane.showMessageDialog(this, "Comment updated successfully!");
             } else {
-                JOptionPane.showMessageDialog(this, "No found with id " + taskId, "Update Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "No task found with id " + taskId, "Update Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error updating in database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error updating comment in database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
@@ -128,28 +129,26 @@ public class AgentDashboard extends JFrame {
         }
     }
 
-    private void fetchTaskById(int taskId) {
-        String query = "SELECT id, Titre, Description, superieur FROM tache WHERE id = ?";
+    private void fetchTaskByTitle(String title) {
+        String query = "SELECT tache.id, Titre, Description, superieur, commentaires.comment FROM tache LEFT JOIN commentaires ON tache.id = commentaires.Id_Tache WHERE Titre LIKE ?";
         try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, taskId);
+            preparedStatement.setString(1, "%" + title + "%");
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    Object[][] data = {
-                        {
-                            resultSet.getInt("id"),
-                            resultSet.getString("Titre"),
-                            resultSet.getString("Description"),
-                            resultSet.getString("superieur")
-                        }
-                    };
-                    DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Task ID", "Title", "Description", "Superieur"});
+                    Object[][] data = new Object[1][5];
+                    data[0][0] = resultSet.getInt("id");
+                    data[0][1] = resultSet.getString("Titre");
+                    data[0][2] = resultSet.getString("Description");
+                    data[0][3] = resultSet.getString("superieur");
+                    data[0][4] = resultSet.getString("comment");
+                    DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Task ID", "Title", "Description", "Superieur", "Comment"});
                     taskTable.setModel(tableModel);
                     applyCustomCellRenderer();  // Apply custom cell renderer
-                    taskIdValueLabel.setText(String.valueOf(taskId));  // Set Task ID value
+                    taskIdValueLabel.setText(String.valueOf(resultSet.getInt("id")));  // Set Task ID value
                 } else {
                     Object[][] data = getTaskDataFromDatabase();
-                    DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Task ID", "Title", "Description", "Superieur"});
+                    DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Task ID", "Title", "Description", "Superieur", "Comment"});
                     taskTable.setModel(tableModel);
                     applyCustomCellRenderer();  // Apply custom cell renderer
                 }
@@ -169,6 +168,8 @@ public class AgentDashboard extends JFrame {
                     cellComponent.setBackground(columnColor1);
                 } else if (column == 1 || column == 3) {
                     cellComponent.setBackground(columnColor2);
+                } else if (column == 4) {
+                    cellComponent.setBackground(columnColor1);
                 } else {
                     cellComponent.setBackground(Color.WHITE);
                 }
@@ -195,7 +196,7 @@ public class AgentDashboard extends JFrame {
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
-        String[] columnNames = {"Task ID", "Title", "Description", "Superieur"};
+        String[] columnNames = {"Task ID", "Title", "Description", "Superieur", "Comment"};
         Object[][] data = getTaskDataFromDatabase();
 
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
@@ -229,10 +230,10 @@ public class AgentDashboard extends JFrame {
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.setBackground(panelColor);
-        JLabel searchLabel = new JLabel("Search Tasks:");
+        JLabel searchLabel = new JLabel("Search Tasks by Title:");
         searchLabel.setFont(labelFont);
-        taskIdSearchField = new JTextField(10);
-        taskIdSearchField.getDocument().addDocumentListener(new DocumentListener() {
+        taskTitleSearchField = new JTextField(10);
+        taskTitleSearchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 searchTask();
@@ -249,14 +250,9 @@ public class AgentDashboard extends JFrame {
             }
 
             private void searchTask() {
-                String taskIdText = taskIdSearchField.getText();
-                if (!taskIdText.isEmpty()) {
-                    try {
-                        int taskId = Integer.parseInt(taskIdText);
-                        fetchTaskById(taskId);
-                    } catch (NumberFormatException ex) {
-                        // Ignore invalid numbers
-                    }
+                String taskTitleText = taskTitleSearchField.getText();
+                if (!taskTitleText.isEmpty()) {
+                    fetchTaskByTitle(taskTitleText);
                 } else {
                     Object[][] data = getTaskDataFromDatabase();
                     DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
@@ -266,7 +262,7 @@ public class AgentDashboard extends JFrame {
             }
         });
         searchPanel.add(searchLabel);
-        searchPanel.add(taskIdSearchField);
+        searchPanel.add(taskTitleSearchField);
         mainPanel.add(searchPanel, BorderLayout.NORTH);
 
         JPanel buttonPanel = new JPanel(new BorderLayout(10, 10));
@@ -347,3 +343,4 @@ public class AgentDashboard extends JFrame {
         showAgentDashboard("sohail");
     }
 }
+
