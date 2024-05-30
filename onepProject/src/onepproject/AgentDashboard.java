@@ -23,7 +23,7 @@ public class AgentDashboard extends JFrame {
     private Color panelColor = new Color(220, 220, 220); // Slightly darker gray
     private Color buttonColor = new Color(70, 130, 180); // Steel blue
     private Color buttonTextColor = Color.WHITE;
-    private Color columnColor1 = new Color(255, 255, 204); // Light yellow
+    private Color columnColor1 = new Color(245, 245, 245); // Light gray
     private Color columnColor2 = new Color(204, 229, 255); // Light blue
 
     private Font labelFont = new Font("Arial", Font.BOLD, 14);
