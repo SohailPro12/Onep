@@ -353,7 +353,4 @@ public class AgentDashboard extends JFrame {
         
     }
 
-    public static void main(String[] args) {
-        showAgentDashboard("sohail");
-    }
 }
