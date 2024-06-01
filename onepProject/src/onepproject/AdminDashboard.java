@@ -26,7 +26,7 @@ public class AdminDashboard {
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         adminDashboardFrame.add(titleLabel, BorderLayout.NORTH);
 
-        String[] columnNames = {"Login", "Gmail", "Number", "Select"};
+        String[] columnNames = {"Login", "Gmail", "Numero", "Selectionner"};
         Object[][] data = fetchDataFromDatabase();
 
         DefaultTableModel model = new DefaultTableModel(data, columnNames) {
@@ -123,19 +123,19 @@ public class AdminDashboard {
                     String number = (String) table.getValueAt(selectedRow, 2);
 
                     int confirmation = JOptionPane.showConfirmDialog(adminDashboardFrame,
-                            "Are you sure you want to delete this row?\nLogin: " + login + "\nEmail: " + email + "\nNumber: " + number,
+                            "Êtes-vous sûr de vouloir supprimer cette ligne?\nLogin: " + login + "\nEmail: " + email + "\nNumber: " + number,
                             "Delete Confirmation", JOptionPane.YES_NO_OPTION);
 
                     if (confirmation == JOptionPane.YES_OPTION) {
                         if (deleteRowFromDatabase(login)) {
                             ((DefaultTableModel) table.getModel()).removeRow(selectedRow);
-                            JOptionPane.showMessageDialog(adminDashboardFrame, "Row deleted successfully.");
+                            JOptionPane.showMessageDialog(adminDashboardFrame, "Ligne supprimée avec succès.");
                         } else {
-                            JOptionPane.showMessageDialog(adminDashboardFrame, "Failed to delete row from database.");
+                            JOptionPane.showMessageDialog(adminDashboardFrame, "Impossible de supprimer la ligne de la base de données.");
                         }
                     }
                 } else {
-                    JOptionPane.showMessageDialog(adminDashboardFrame, "Please select a row.");
+                    JOptionPane.showMessageDialog(adminDashboardFrame, "Veuillez sélectionner une ligne.");
                 }
             }
         });

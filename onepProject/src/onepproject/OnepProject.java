@@ -54,7 +54,7 @@ public class OnepProject {
         // Header with Logo
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        JLabel headerLabel = new JLabel("Welcome to One Project", SwingConstants.CENTER);
+        JLabel headerLabel = new JLabel("Welcome to CoordiTeam", SwingConstants.CENTER);
         headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
         headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 

@@ -54,7 +54,7 @@ public class SuperieurDashboard {
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 1;
-        topPanel.add(new JLabel("Task ID:"), gbc);
+        topPanel.add(new JLabel("ID de tâche:"), gbc);
 
         gbc.gridx = 1;
         JTextField taskIdField = new JTextField(20);
@@ -63,7 +63,7 @@ public class SuperieurDashboard {
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        topPanel.add(new JLabel("Title:"), gbc);
+        topPanel.add(new JLabel("Titre:"), gbc);
 
         gbc.gridx = 1;
         JTextField titleField = new JTextField(20);
@@ -79,7 +79,7 @@ public class SuperieurDashboard {
 
         gbc.gridx = 0;
         gbc.gridy = 4;
-        topPanel.add(new JLabel("Department:"), gbc);
+        topPanel.add(new JLabel("Département:"), gbc);
 
         gbc.gridx = 1;
         JComboBox<String> departmentComboBox = new JComboBox<>();
