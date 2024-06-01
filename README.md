@@ -26,29 +26,7 @@ OneP Project is a Java application designed to manage user authentication and ta
    git clone https://github.com/your_username/onep-project.git
    ```
 
-2. Set up a MySQL database by executing the SQL dump provided in the `database_dump.sql` file.
-
-   ```sql
-   -- MySQL database creation script
-   CREATE DATABASE onep_db;
-
-   USE onep_db;
-
-   -- Table structure for `admin`
-   CREATE TABLE `admin` (
-     `login` varchar(10) NOT NULL,
-     `pass` varchar(50) NOT NULL,
-     PRIMARY KEY (`login`)
-   );
-
-   -- Insert data into `admin` table
-   INSERT INTO `admin` (`login`, `pass`) VALUES
-   ('ronaldo', '1234567890');
-
-   -- Additional table structures and data insertions...
-   ```
-
-3. Configure the database connection details in the `UserLoginForm.java` file.
+2. Configure the database connection details.
 
 Here's the full SQL code for creating the database and tables for the OneP Project:
 
@@ -131,9 +109,9 @@ CREATE TABLE IF NOT EXISTS `tache` (
 
 ```
 
-4. Import the project into your preferred Java IDE.
+3. Import the project into your preferred Java IDE.
 
-5. Run the application.
+4. Run the application.
 
 ## Usage
 
