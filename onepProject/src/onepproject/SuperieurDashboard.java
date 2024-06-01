@@ -23,7 +23,7 @@ public class SuperieurDashboard {
     public static void showSuperieurDashboard(JFrame parentFrame, String username) {
         JFrame dashboardFrame = new JFrame("Superieur Dashboard");
         dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dashboardFrame.setSize(1200, 800);
+        dashboardFrame.setSize(1200, 700);
         dashboardFrame.setLocationRelativeTo(null);
         dashboardFrame.setLayout(new BorderLayout());
 
