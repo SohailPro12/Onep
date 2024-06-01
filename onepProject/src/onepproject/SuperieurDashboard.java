@@ -3,11 +3,10 @@ package onepproject;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.sql.*;
+import javax.swing.border.EmptyBorder;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -24,18 +23,24 @@ public class SuperieurDashboard {
     public static void showSuperieurDashboard(JFrame parentFrame, String username) {
         JFrame dashboardFrame = new JFrame("Superieur Dashboard");
         dashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        dashboardFrame.setSize(1000, 800);
-
+        dashboardFrame.setSize(1200, 800);
         dashboardFrame.setLocationRelativeTo(null);
-        dashboardFrame.setResizable(false); // Disable resizing
-        dashboardFrame.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        dashboardFrame.setLayout(new BorderLayout());
 
         // Setting background color
         dashboardFrame.getContentPane().setBackground(new Color(240, 240, 240));
+
+        // Main Panel with BorderLayout
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        mainPanel.setBackground(new Color(240, 240, 240));
+
+        // Top Panel
+        JPanel topPanel = new JPanel(new GridBagLayout());
+        topPanel.setBackground(new Color(240, 240, 240));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Task Form Label
         gbc.gridx = 0;
@@ -44,75 +49,74 @@ public class SuperieurDashboard {
         JLabel taskFormLabel = new JLabel("Task Form");
         taskFormLabel.setFont(new Font("Arial", Font.BOLD, 20));
         taskFormLabel.setForeground(new Color(0, 102, 204));
-        dashboardFrame.add(taskFormLabel, gbc);
+        topPanel.add(taskFormLabel, gbc);
 
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 1;
-        dashboardFrame.add(new JLabel("Task ID:"), gbc);
+        topPanel.add(new JLabel("Task ID:"), gbc);
 
         gbc.gridx = 1;
         JTextField taskIdField = new JTextField(20);
         taskIdField.setEditable(false);
-        dashboardFrame.add(taskIdField, gbc);
+        topPanel.add(taskIdField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        dashboardFrame.add(new JLabel("Title:"), gbc);
+        topPanel.add(new JLabel("Title:"), gbc);
 
         gbc.gridx = 1;
         JTextField titleField = new JTextField(20);
-        dashboardFrame.add(titleField, gbc);
+        topPanel.add(titleField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
-        dashboardFrame.add(new JLabel("Description:"), gbc);
+        topPanel.add(new JLabel("Description:"), gbc);
 
         gbc.gridx = 1;
         JTextField descriptionField = new JTextField(20);
-        dashboardFrame.add(descriptionField, gbc);
+        topPanel.add(descriptionField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 4;
-        dashboardFrame.add(new JLabel("Department:"), gbc);
+        topPanel.add(new JLabel("Department:"), gbc);
 
         gbc.gridx = 1;
         JComboBox<String> departmentComboBox = new JComboBox<>();
         loadDepartments(departmentComboBox);
-        dashboardFrame.add(departmentComboBox, gbc);
+        topPanel.add(departmentComboBox, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 5;
-        dashboardFrame.add(new JLabel("Agent:"), gbc);
+        topPanel.add(new JLabel("Agent:"), gbc);
 
         gbc.gridx = 1;
         JComboBox<String> agentComboBox = new JComboBox<>();
-        dashboardFrame.add(agentComboBox, gbc);
+        topPanel.add(agentComboBox, gbc);
 
         departmentComboBox.addActionListener(e -> loadAgents(departmentComboBox, agentComboBox));
 
         gbc.gridx = 0;
         gbc.gridy = 6;
-        dashboardFrame.add(new JLabel("Budget:"), gbc);
+        topPanel.add(new JLabel("Budget:"), gbc);
 
         gbc.gridx = 1;
         JTextField budgetField = new JTextField(20);
-        dashboardFrame.add(budgetField, gbc);
+        topPanel.add(budgetField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 7;
-        dashboardFrame.add(new JLabel("Superieur:"), gbc);
+        topPanel.add(new JLabel("Superieur:"), gbc);
 
         gbc.gridx = 1;
         JTextField supField = new JTextField(20);
-        dashboardFrame.add(supField, gbc);
+        topPanel.add(supField, gbc);
 
         // Task buttons in one line
         gbc.gridx = 0;
         gbc.gridy = 8;
         gbc.gridwidth = 2;
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JButton addButton = new JButton("Ajouter");
         JButton deleteButton = new JButton("Supprimer");
         JButton modifyButton = new JButton("Modifier");
@@ -121,37 +125,14 @@ public class SuperieurDashboard {
         buttonPanel.add(deleteButton);
         buttonPanel.add(modifyButton);
         buttonPanel.add(clearButton);
-        dashboardFrame.add(buttonPanel, gbc);
-
-        // DataGrid view
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridheight = 10;
-        gbc.gridwidth = 10;
-        gbc.fill = GridBagConstraints.BOTH;
-        String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
-        JTable taskTable = new JTable(tableModel);
-        taskTable.setBackground(new Color(255, 255, 204));
-        taskTable.setGridColor(new Color(102, 178, 255));
-        taskTable.setSelectionBackground(new Color(255, 204, 153));
-        JScrollPane scrollPane = new JScrollPane(taskTable);
-        dashboardFrame.add(scrollPane, gbc);
-
-        // Expand button next to DataGrid view
-        gbc.gridx = 5;
-        gbc.gridy = 10;
-        gbc.gridheight = 1;
-        gbc.gridwidth = 1;
-        JButton expandButton = new JButton("Expand");
-        dashboardFrame.add(expandButton, gbc);
+        topPanel.add(buttonPanel, gbc);
 
         // Detailed information area
         gbc.gridx = 0;
         gbc.gridy = 9;
         gbc.gridwidth = 2;
         JLabel detailLabel = new JLabel("Commentaire:");
-        dashboardFrame.add(detailLabel, gbc);
+        topPanel.add(detailLabel, gbc);
 
         gbc.gridy = 10;
         gbc.gridheight = 2;
@@ -160,63 +141,90 @@ public class SuperieurDashboard {
         detailArea.setWrapStyleWord(true);
         detailArea.setEditable(false);
         JScrollPane detailScrollPane = new JScrollPane(detailArea);
-        dashboardFrame.add(detailScrollPane, gbc);
+        topPanel.add(detailScrollPane, gbc);
 
         // Response field
         gbc.gridy = 12;
         gbc.gridheight = 1;
-        dashboardFrame.add(new JLabel("Response:"), gbc);
+        topPanel.add(new JLabel("Response:"), gbc);
 
         gbc.gridy = 13;
         JTextField responseField = new JTextField(20);
-        dashboardFrame.add(responseField, gbc);
+        topPanel.add(responseField, gbc);
 
         // Button to save the response
         gbc.gridy = 14;
         gbc.gridwidth = 1;
         JButton saveResponseButton = new JButton("Save Response");
-        dashboardFrame.add(saveResponseButton, gbc);
-        // Search by Task ID
-        gbc.gridx = 2;
-        gbc.gridy = 11;
+        topPanel.add(saveResponseButton, gbc);
+
+        mainPanel.add(topPanel, BorderLayout.WEST);
+
+        // Right Panel for DataGrid view and Search
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.setBackground(new Color(240, 240, 240));
+
+        // DataGrid view
+        String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable taskTable = new JTable(tableModel);
+        taskTable.setBackground(new Color(255, 255, 204));
+        taskTable.setGridColor(new Color(102, 178, 255));
+        taskTable.setSelectionBackground(new Color(255, 204, 153));
+        JScrollPane scrollPane = new JScrollPane(taskTable);
+        rightPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Expand button next to DataGrid view
+        JButton expandButton = new JButton("Expand");
+        rightPanel.add(expandButton, BorderLayout.SOUTH);
+
+        // Search Panel
+        JPanel searchPanel = new JPanel(new GridBagLayout());
+        searchPanel.setBackground(new Color(240, 240, 240));
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.gridwidth = 1;
         JLabel searchLabel = new JLabel("Search by Task ID:");
-        dashboardFrame.add(searchLabel, gbc);
+        searchPanel.add(searchLabel, gbc);
 
-        gbc.gridx = 3;
-        gbc.gridy = 11;
+        gbc.gridx = 1;
         JTextField searchBar = new JTextField(15);
-        dashboardFrame.add(searchBar, gbc);
+        searchPanel.add(searchBar, gbc);
 
         // Search by Agent Name
-        gbc.gridx = 2;
-        gbc.gridy = 12;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         JLabel searchAgentLabel = new JLabel("Search by Agent Name:");
-        dashboardFrame.add(searchAgentLabel, gbc);
+        searchPanel.add(searchAgentLabel, gbc);
 
-        gbc.gridx = 3;
-        gbc.gridy = 12;
+        gbc.gridx = 1;
         JTextField searchAgentBar = new JTextField(15);
-        dashboardFrame.add(searchAgentBar, gbc);
+        searchPanel.add(searchAgentBar, gbc);
 
-        // Statistiques and View Credentials buttons in one line
-        gbc.gridx = 2;
-        gbc.gridy = 13;
+        // Statistiques and View Credentials buttons
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         gbc.gridwidth = 2;
-        JPanel statsCredButtonPanel = new JPanel();
-        statsCredButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        JPanel statsCredButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JButton statsButton = new JButton("Statistiques");
         JButton viewCredentialsButton = new JButton("View Credentials");
         statsCredButtonPanel.add(statsButton);
         statsCredButtonPanel.add(viewCredentialsButton);
-        dashboardFrame.add(statsCredButtonPanel, gbc);
+        searchPanel.add(statsCredButtonPanel, gbc);
+
+        rightPanel.add(searchPanel, BorderLayout.NORTH);
+
+        mainPanel.add(rightPanel, BorderLayout.CENTER);
 
         // Logout button at the bottom
-        gbc.gridx = 5;
-        gbc.gridy = 13;
-        gbc.gridwidth = 1;
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.setBackground(new Color(240, 240, 240));
         JButton logoutButton = new JButton("Logout");
-        dashboardFrame.add(logoutButton, gbc);
+        bottomPanel.add(logoutButton);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        dashboardFrame.add(mainPanel, BorderLayout.CENTER);
 
         dashboardFrame.setVisible(true);
 
@@ -228,50 +236,31 @@ public class SuperieurDashboard {
         superieurFullName = getSuperieurFullName(username);
         supField.setText(superieurFullName);
 
-        addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addTask(titleField, descriptionField, agentComboBox, budgetField, supField, tableModel, taskIdField);
-                resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
-            }
+        addButton.addActionListener(e -> {
+            addTask(titleField, descriptionField, agentComboBox, budgetField, supField, tableModel, taskIdField);
+            resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
         });
 
-        deleteButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                deleteTask(taskTable, tableModel);
-                resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
-            }
+        deleteButton.addActionListener(e -> {
+            deleteTask(taskTable, tableModel);
+            resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
         });
 
-        modifyButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                modifyTask(taskTable, titleField, descriptionField, agentComboBox, budgetField, tableModel);
-                resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
-            }
+        modifyButton.addActionListener(e -> {
+            modifyTask(taskTable, titleField, descriptionField, agentComboBox, budgetField, tableModel);
+            resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
         });
 
-        searchBar.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                searchTasksById(searchBar, tableModel);
-            }
+        searchBar.addActionListener(e -> searchTasksById(searchBar, tableModel));
+
+        logoutButton.addActionListener(e -> {
+            dashboardFrame.dispose();
+            UserLoginForm.showUserLoginForm(parentFrame);
         });
 
-        logoutButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dashboardFrame.dispose();
-                UserLoginForm.showUserLoginForm(parentFrame);
-            }
-        });
+        statsButton.addActionListener(e -> showStatistics());
 
-        statsButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showStatistics();
-            }
-        });
-        viewCredentialsButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showCredentialsView();
-            }
-        });
+        viewCredentialsButton.addActionListener(e -> showCredentialsView());
 
         searchAgentBar.addKeyListener(new KeyAdapter() {
             @Override
@@ -280,73 +269,62 @@ public class SuperieurDashboard {
             }
         });
 
-        saveResponseButton.addActionListener(new ActionListener() {
-    public void actionPerformed(ActionEvent e) {
-        int selectedRow = taskTable.getSelectedRow();
-        if (selectedRow != -1) {
-            int taskId = (int) taskTable.getValueAt(selectedRow, 0);
-            String response = responseField.getText();
+        saveResponseButton.addActionListener(e -> {
+            int selectedRow = taskTable.getSelectedRow();
+            if (selectedRow != -1) {
+                int taskId = (int) taskTable.getValueAt(selectedRow, 0);
+                String response = responseField.getText();
 
-            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-                String query = "UPDATE commentaires SET reponse = ? WHERE Id_Tache = ?";
-                try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                    stmt.setString(1, response);
-                    stmt.setInt(2, taskId);
-                    stmt.executeUpdate();
+                try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+                    String query = "UPDATE commentaires SET reponse = ? WHERE Id_Tache = ?";
+                    try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                        stmt.setString(1, response);
+                        stmt.setInt(2, taskId);
+                        stmt.executeUpdate();
+                    }
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
-                
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-});
-
-        
-        expandButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JFrame expandFrame = new JFrame("Expanded DataGrid View");
-                expandFrame.setSize(1000, 600);
-                JTable expandedTable = new JTable(tableModel);
-                expandFrame.add(new JScrollPane(expandedTable));
-                
-        expandedTable.setBackground(new Color(255, 255, 204));
-        expandedTable.setGridColor(new Color(102, 178, 255));
-        expandedTable.setSelectionBackground(new Color(255, 204, 153));
-                expandFrame.setVisible(true);
             }
         });
 
-      taskTable.getSelectionModel().addListSelectionListener(event -> {
-    if (!event.getValueIsAdjusting() && taskTable.getSelectedRow() != -1) {
-        int selectedRow = taskTable.getSelectedRow();
-        taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
-        titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
-        descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
-        String agentName = taskTable.getValueAt(selectedRow, 3).toString();
-        budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
+        expandButton.addActionListener(e -> {
+            JFrame expandFrame = new JFrame("Expanded DataGrid View");
+            expandFrame.setSize(1000, 600);
+            JTable expandedTable = new JTable(tableModel);
+            expandFrame.add(new JScrollPane(expandedTable));
 
-        // Get department name based on agent name
-        String departmentName = getDepartmentNameByAgent(agentName);
-        System.out.println(agentName);
-        departmentComboBox.setSelectedItem(departmentName);
+            expandedTable.setBackground(new Color(255, 255, 204));
+            expandedTable.setGridColor(new Color(102, 178, 255));
+            expandedTable.setSelectionBackground(new Color(255, 204, 153));
+            expandFrame.setVisible(true);
+        });
 
-        // Load agents for the selected department and set the selected agent
-        loadAgents(departmentComboBox, agentComboBox);
-        agentComboBox.setSelectedItem(agentName);
-        
-           detailArea.setText(taskTable.getValueAt(selectedRow, 5).toString());
-                    responseField.setText("");
-    }});
-              
+        taskTable.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting() && taskTable.getSelectedRow() != -1) {
+                int selectedRow = taskTable.getSelectedRow();
+                taskIdField.setText(taskTable.getValueAt(selectedRow, 0).toString());
+                titleField.setText(taskTable.getValueAt(selectedRow, 1).toString());
+                descriptionField.setText(taskTable.getValueAt(selectedRow, 2).toString());
+                String agentName = taskTable.getValueAt(selectedRow, 3).toString();
+                budgetField.setText(taskTable.getValueAt(selectedRow, 4).toString());
 
-        clearButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField);
+                // Get department name based on agent name
+                String departmentName = getDepartmentNameByAgent(agentName);
+                departmentComboBox.setSelectedItem(departmentName);
+
+                // Load agents for the selected department and set the selected agent
+                loadAgents(departmentComboBox, agentComboBox);
+                agentComboBox.setSelectedItem(agentName);
+
+                detailArea.setText(taskTable.getValueAt(selectedRow, 5).toString());
+                responseField.setText("");
             }
         });
+
+        clearButton.addActionListener(e -> resetFields(taskIdField, titleField, descriptionField, departmentComboBox, agentComboBox, budgetField, supField));
     }
-    
     
     
     private static void loadDepartments(JComboBox<String> departmentComboBox) {
