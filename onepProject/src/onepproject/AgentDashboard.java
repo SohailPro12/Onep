@@ -350,6 +350,7 @@ public class AgentDashboard extends JFrame {
 
     public static void showAgentDashboard(String username) {
         SwingUtilities.invokeLater(() -> new AgentDashboard(username));
+        
     }
 
     public static void main(String[] args) {

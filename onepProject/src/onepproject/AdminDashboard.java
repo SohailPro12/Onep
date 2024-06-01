@@ -1,6 +1,7 @@
 package onepproject;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,16 +18,17 @@ public class AdminDashboard {
         JFrame adminDashboardFrame = new JFrame("Admin Dashboard");
         adminDashboardFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         adminDashboardFrame.setSize(1000, 600);
+        adminDashboardFrame.setLocationRelativeTo(null);
         adminDashboardFrame.setLayout(new BorderLayout());
 
         JLabel titleLabel = new JLabel("Demande de récupération", JLabel.CENTER);
-        titleLabel.setFont(new Font("Serif", Font.BOLD, 20));
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         adminDashboardFrame.add(titleLabel, BorderLayout.NORTH);
 
         String[] columnNames = {"Login", "Gmail", "Number", "Select"};
         Object[][] data = fetchDataFromDatabase();
 
-        // Custom TableModel to include radio buttons
         DefaultTableModel model = new DefaultTableModel(data, columnNames) {
             Class[] types = new Class[]{String.class, String.class, String.class, Boolean.class};
             boolean[] canEdit = new boolean[]{false, false, false, true};
@@ -47,7 +49,30 @@ public class AdminDashboard {
         table.setRowHeight(30);
         table.setFont(new Font("SansSerif", Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
-        table.getTableHeader().setBackground(Color.LIGHT_GRAY);
+        table.getTableHeader().setBackground(new Color(0, 102, 204)); // Blue header
+        table.getTableHeader().setForeground(Color.WHITE);
+
+        // Custom cell renderer for alternating row colors and selected row color
+        DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (isSelected) {
+                    c.setBackground(Color.ORANGE); // Orange for selected row
+                    c.setForeground(Color.BLACK);
+                } else {
+                    if (row % 2 == 0) {
+                        c.setBackground(new Color(255, 255, 204)); // Light yellow
+                    } else {
+                        c.setBackground(Color.WHITE);
+                    }
+                    c.setForeground(Color.BLACK);
+                }
+                return c;
+            }
+        };
+
+        table.setDefaultRenderer(Object.class, cellRenderer);
 
         JScrollPane scrollPane = new JScrollPane(table);
         adminDashboardFrame.add(scrollPane, BorderLayout.CENTER);
@@ -56,6 +81,22 @@ public class AdminDashboard {
         JButton logoutButton = new JButton("Logout");
         JButton createAccountButton = new JButton("Create Account");
         JButton doneButton = new JButton("Done");
+
+        logoutButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        createAccountButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        doneButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+        logoutButton.setBackground(new Color(70, 130, 180));
+        createAccountButton.setBackground(new Color(70, 130, 180));
+        doneButton.setBackground(new Color(70, 130, 180));
+
+        logoutButton.setForeground(Color.WHITE);
+        createAccountButton.setForeground(Color.WHITE);
+        doneButton.setForeground(Color.WHITE);
+
+        logoutButton.setFocusPainted(false);
+        createAccountButton.setFocusPainted(false);
+        doneButton.setFocusPainted(false);
 
         logoutButton.addActionListener(new ActionListener() {
             @Override
@@ -75,23 +116,23 @@ public class AdminDashboard {
         doneButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Get selected row
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1) {
-                    // Retrieve data from selected row
                     String login = (String) table.getValueAt(selectedRow, 0);
                     String email = (String) table.getValueAt(selectedRow, 1);
                     String number = (String) table.getValueAt(selectedRow, 2);
 
-                    // Perform actions with retrieved data
-                    JOptionPane.showMessageDialog(adminDashboardFrame, "Selected row:\nLogin: " + login + "\nEmail: " + email + "\nNumber: " + number);
+                    int confirmation = JOptionPane.showConfirmDialog(adminDashboardFrame,
+                            "Are you sure you want to delete this row?\nLogin: " + login + "\nEmail: " + email + "\nNumber: " + number,
+                            "Delete Confirmation", JOptionPane.YES_NO_OPTION);
 
-                    // Delete selected row from database
-                    if (deleteRowFromDatabase(login)) {
-                        // Remove row from table
-                        ((DefaultTableModel) table.getModel()).removeRow(selectedRow);
-                    } else {
-                        JOptionPane.showMessageDialog(adminDashboardFrame, "Failed to delete row from database.");
+                    if (confirmation == JOptionPane.YES_OPTION) {
+                        if (deleteRowFromDatabase(login)) {
+                            ((DefaultTableModel) table.getModel()).removeRow(selectedRow);
+                            JOptionPane.showMessageDialog(adminDashboardFrame, "Row deleted successfully.");
+                        } else {
+                            JOptionPane.showMessageDialog(adminDashboardFrame, "Failed to delete row from database.");
+                        }
                     }
                 } else {
                     JOptionPane.showMessageDialog(adminDashboardFrame, "Please select a row.");
@@ -126,11 +167,12 @@ public class AdminDashboard {
                     row.add(rs.getString("login"));
                     row.add(rs.getString("email"));
                     row.add(rs.getString("numero_tel"));
-                    row.add(false); // Default value for radio button
+                    row.add(false);
                     dataVector.add(row);
                 }
             }
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error fetching data from database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
 
@@ -150,6 +192,7 @@ public class AdminDashboard {
                 return affectedRows > 0;
             }
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error deleting row from database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
             return false;
         }
