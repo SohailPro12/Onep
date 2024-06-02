@@ -339,14 +339,14 @@ public class AgentDashboard extends JFrame {
 private void updateCommentInDatabase(int taskId, String comment, String progression, String username) {
     try (Connection connection = DriverManager.getConnection(DATABASE_URL , DATABASE_USER , DATABASE_PASSWORD)) {
         // Update comment in commentaires table
-        String updateQuery = "REPLACE INTO commentaires (Id_Tache, Comment, Progression, Agent) VALUES (?, ?, ?, ?)";
+        String updateQuery ="UPDATE commentaires SET Comment = ?, Progression = ?, Agent = ? WHERE Id_Tache = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-            preparedStatement.setInt(1, taskId);
-            preparedStatement.setString(2, comment);
+            preparedStatement.setString(1, comment);
             // Calculate progression value
             int calculatedProgression = calculateProgression(progression);
-            preparedStatement.setInt(3, calculatedProgression);
-            preparedStatement.setString(4, username);
+            preparedStatement.setInt(2, calculatedProgression);
+            preparedStatement.setString(3, username);
+            preparedStatement.setInt(4, taskId);
             preparedStatement.executeUpdate();
             JOptionPane.showMessageDialog(null, "Comment updated successfully.");
 
