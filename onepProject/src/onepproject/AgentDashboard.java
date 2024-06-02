@@ -30,140 +30,97 @@ public class AgentDashboard extends JFrame {
     private Font labelFont = new Font("Arial", Font.BOLD, 14);
     private Font buttonFont = new Font("Arial", Font.BOLD, 12);
 
-    private Object[][] getTaskDataFromDatabase() {
-        String query = "SELECT tache.id, Titre, Description, superieur, commentaires.comment, progression, reponse FROM tache LEFT JOIN commentaires ON tache.id = commentaires.Id_Tache";
-        try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
-             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-             ResultSet resultSet = statement.executeQuery(query)) {
+    private Object[][] getTaskDataFromDatabase(String username) {
+        String AgentFullName = getAgentFullName(username);
+        Object[][] data = null;
+        try (Connection conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
+             Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
 
-            resultSet.last();
-            int rowCount = resultSet.getRow();
-            resultSet.beforeFirst();
+            String query = "SELECT tache.id, Titre, Description, superieur, commentaires.comment, progression,reponse FROM tache LEFT JOIN commentaires ON tache.id = commentaires.Id_Tache WHERE tache.Agent = '" + AgentFullName + "'";
+            ResultSet rs = stmt.executeQuery(query);
 
-            Object[][] data = new Object[rowCount][7]; // 7 columns in the table
-            int row = 0;
-            while (resultSet.next()) {
-                data[row][0] = resultSet.getInt("id");
-                data[row][1] = resultSet.getString("Titre");
-                data[row][2] = resultSet.getString("Description");
-                data[row][3] = resultSet.getString("superieur");
-                data[row][4] = resultSet.getString("comment");
-                data[row][5] = resultSet.getInt("progression");
-                data[row][6] = resultSet.getString("reponse");
-                row++;
+            rs.last();  // Move to the last row
+            int rowCount = rs.getRow();  // Get the row count
+            rs.beforeFirst();  // Move back to the first row
+
+            data = new Object[rowCount][7];
+            int i = 0;
+            while (rs.next()) {
+                data[i][0] = rs.getInt("id");
+                data[i][1] = rs.getString("Titre");
+                data[i][2] = rs.getString("Description");
+                data[i][3] = rs.getString("Superieur");
+                data[i][4] = rs.getString("Comment");
+                data[i][5] = rs.getString("Progression");
+                data[i][6] = rs.getString("reponse");
+                i++;
             }
-            return data;
-
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error fetching data from database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-            return new Object[0][0];
+            JOptionPane.showMessageDialog(null, "Error fetching data from database: " + e.getMessage());
         }
+        return data;
     }
 
-    private void fetchCommentAndProgression(int taskId) {
-        String query = "SELECT comment, progression, reponse FROM commentaires WHERE Id_Tache = ?";
-        try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, taskId);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    String comment = resultSet.getString("comment");
-                    int progression = resultSet.getInt("progression");
-
-                    commentField.setText(comment);
-                    switch (progression) {
-                        case 0:
-                            progressionComboBox.setSelectedItem("Not Started");
-                            break;
-                        case 50:
-                            progressionComboBox.setSelectedItem("In Progress");
-                            break;
-                        case 100:
-                            progressionComboBox.setSelectedItem("Completed");
-                            break;
-                        default:
-                            progressionComboBox.setSelectedItem("Not Started");
+    private String getAgentFullName(String username) {
+        try (Connection conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD)) {
+            String query = "SELECT NomComplete FROM agent WHERE login = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("NomComplete");
                     }
-                } else {
-                    commentField.setText("");
-                    progressionComboBox.setSelectedItem("Not Started");
                 }
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error fetching comment and progression from database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+        return "";
     }
 
-    private void updateCommentInDatabase(int taskId, String comment, String progression, String agent) {
-        int numericProgression = calculateProgression(progression);
+    private void fetchTaskByTitle(String title, String username) {
+    Object[][] data = null;
+    try (Connection conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
+         Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
 
-        String query = "UPDATE commentaires SET comment=?, progression=?, Agent=? WHERE Id_Tache=?";
-        try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, comment);
-            preparedStatement.setInt(2, numericProgression);
-            preparedStatement.setString(3, agent);
-            preparedStatement.setInt(4, taskId);
+       String query = "SELECT id, Titre, Description, Superieur, 'N/A' as Comment, 'N/A' as Progression, 'N/A' as Response " +
+           "FROM tache WHERE Titre LIKE '%" + title + "%' AND Agent = '" + username + "'";
 
-            int rowsUpdated = preparedStatement.executeUpdate();
-            if (rowsUpdated > 0) {
-                JOptionPane.showMessageDialog(this, "Comment updated successfully!");
-                refreshTaskTable();
-            } else {
-                JOptionPane.showMessageDialog(this, "No task found with id " + taskId, "Update Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error updating comment in database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+        ResultSet rs = stmt.executeQuery(query);
+
+        rs.last();  // Move to the last row
+        int rowCount = rs.getRow();  // Get the row count
+        rs.beforeFirst();  // Move back to the first row
+
+        data = new Object[rowCount][7];
+        int i = 0;
+        while (rs.next()) {
+            data[i][0] = rs.getInt("id");
+            data[i][1] = rs.getString("Titre");
+            data[i][2] = rs.getString("Description");
+            data[i][3] = rs.getString("Superieur");
+            data[i][4] = rs.getString("Comment");
+            data[i][5] = rs.getString("Progression");
+            data[i][6] = rs.getString("reponse");
+            i++;
         }
-    }
 
-    private int calculateProgression(String progressionLabel) {
-        switch (progressionLabel) {
-            case "Not Started":
-                return 0;
-            case "In Progress":
-                return 50;
-            case "Completed":
-                return 100;
-            default:
-                return 0;
+        if (rowCount == 0) {
+            // Si aucun résultat n'est trouvé, définissez les données sur un tableau vide
+            data = new Object[0][7];
         }
-    }
 
-    private void fetchTaskByTitle(String title) {
-        String query = "SELECT tache.id, Titre, Description, superieur, commentaires.comment, progression, reponse FROM tache LEFT JOIN commentaires ON tache.id = commentaires.Id_Tache WHERE Titre LIKE ?";
-        try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, "%" + title + "%");
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    Object[][] data = new Object[1][7];
-                    data[0][0] = resultSet.getInt("id");
-                    data[0][1] = resultSet.getString("Titre");
-                    data[0][2] = resultSet.getString("Description");
-                    data[0][3] = resultSet.getString("superieur");
-                    data[0][4] = resultSet.getString("comment");
-                    data[0][5] = resultSet.getInt("progression");
-                    data[0][6] = resultSet.getString("reponse");
-                    DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Task ID", "Title", "Description", "Superieur", "Comment", "Progression", "Response"});
-                    taskTable.setModel(tableModel);
-                    applyCustomCellRenderer();  // Apply custom cell renderer
-                    taskIdValueLabel.setText(String.valueOf(resultSet.getInt("id")));  // Set Task ID value
-                } else {
-                    Object[][] data = getTaskDataFromDatabase();
-                    DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Task ID", "Title", "Description", "Superieur", "Comment", "Progression", "Response"});
-                    taskTable.setModel(tableModel);
-                    applyCustomCellRenderer();  // Apply custom cell renderer
-                }
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error fetching task from database: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
+        DefaultTableModel tableModel = new DefaultTableModel(data,
+                new String[]{"Task ID", "Title", "Description", "Superieur", "Comment", "Progression", "Reponse"});
+        taskTable.setModel(tableModel);
+        applyCustomCellRenderer();
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error fetching data from database: " + e.getMessage());
     }
+}
+
 
     private void applyCustomCellRenderer() {
         TableCellRenderer tableCellRenderer = new DefaultTableCellRenderer() {
@@ -188,11 +145,8 @@ public class AgentDashboard extends JFrame {
         }
     }
 
-    private void refreshTaskTable() {
-        Object[][] data = getTaskDataFromDatabase();
-        DefaultTableModel tableModel = new DefaultTableModel(data, new String[]{"Task ID", "Title", "Description", "Superieur", "Comment", "Progression", "Response"});
-        taskTable.setModel(tableModel);
-        applyCustomCellRenderer();
+    public static void showAgentDashboard(String username) {
+        SwingUtilities.invokeLater(() -> new AgentDashboard(username));
     }
 
     public AgentDashboard(String username) {
@@ -210,7 +164,7 @@ public class AgentDashboard extends JFrame {
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
         String[] columnNames = {"Task ID", "Title", "Description", "Superieur", "Comment", "Progression", "Response"};
-        Object[][] data = getTaskDataFromDatabase();
+        Object[][] data = getTaskDataFromDatabase(username);
 
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
             @Override
@@ -265,9 +219,9 @@ public class AgentDashboard extends JFrame {
             private void searchTask() {
                 String taskTitleText = taskTitleSearchField.getText();
                 if (!taskTitleText.isEmpty()) {
-                    fetchTaskByTitle(taskTitleText);
+                    fetchTaskByTitle(taskTitleText, username);
                 } else {
-                    Object[][] data = getTaskDataFromDatabase();
+                    Object[][] data = getTaskDataFromDatabase(username);
                     DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
                     taskTable.setModel(tableModel);
                     applyCustomCellRenderer();  // Apply custom cell renderer
@@ -348,9 +302,79 @@ public class AgentDashboard extends JFrame {
         setVisible(true);
     }
 
-    public static void showAgentDashboard(String username) {
-        SwingUtilities.invokeLater(() -> new AgentDashboard(username));
-        
+    private void fetchCommentAndProgression(int taskId) {
+        String query = "SELECT comment, progression, reponse FROM commentaires WHERE Id_Tache = ?";
+        try (Connection connection = DriverManager.getConnection(DATABASE_URL , DATABASE_USER , DATABASE_PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, taskId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    String comment = resultSet.getString("comment");
+                    int progression = resultSet.getInt("progression");
+
+                    commentField.setText(comment);
+                    switch (progression) {
+                        case 0:
+                            progressionComboBox.setSelectedItem("Not Started");
+                           
+                            break;
+                        case 1:
+                            progressionComboBox.setSelectedItem("In Progress");
+                            break;
+                        case 2:
+                            progressionComboBox.setSelectedItem("Completed");
+                            break;
+                        default:
+                            progressionComboBox.setSelectedItem("Not Started");
+                            break;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error fetching comment and progression: " + e.getMessage());
+        }
     }
+
+private void updateCommentInDatabase(int taskId, String comment, String progression, String username) {
+    try (Connection connection = DriverManager.getConnection(DATABASE_URL , DATABASE_USER , DATABASE_PASSWORD)) {
+        // Update comment in commentaires table
+        String updateQuery = "REPLACE INTO commentaires (Id_Tache, Comment, Progression, Agent) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+            preparedStatement.setInt(1, taskId);
+            preparedStatement.setString(2, comment);
+            // Calculate progression value
+            int calculatedProgression = calculateProgression(progression);
+            preparedStatement.setInt(3, calculatedProgression);
+            preparedStatement.setString(4, username);
+            preparedStatement.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Comment updated successfully.");
+
+            // Update the specific cells in the table instead of refreshing the entire table
+            int selectedRow = taskTable.getSelectedRow();
+            if (selectedRow != -1) {
+                // Update comment and progression columns
+                taskTable.setValueAt(comment, selectedRow, 4);
+                taskTable.setValueAt(progression, selectedRow, 5);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error updating comment: " + e.getMessage());
+    }
+}
+private int calculateProgression(String progressionLabel) {
+    switch (progressionLabel) {
+        case "Not Started":
+            return 0;
+        case "In Progress":
+            return 50;
+        case "Completed":
+            return 100;
+        default:
+            return 0;
+    }
+}
+
 
 }
