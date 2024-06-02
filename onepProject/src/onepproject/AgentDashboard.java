@@ -6,6 +6,7 @@ import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
+import java.util.regex.PatternSyntaxException;
 
 public class AgentDashboard extends JFrame {
 
@@ -16,19 +17,21 @@ public class AgentDashboard extends JFrame {
     private JLabel taskIdValueLabel;
     private JTextField commentField;
     private JComboBox<String> progressionComboBox;
-    private JTextField taskTitleSearchField;
     private JTable taskTable;
+    private JTextField searchField; // Added search field
 
     private Color backgroundColor = new Color(245, 245, 245); // Light gray
-    private Color panelColor = new Color(220, 220, 220); // Slightly darker gray
+    private Color panelColor = new Color(240, 240, 240); // Couleur de fond pour les panneaux
+
     private Color buttonColor = new Color(70, 130, 180); // Steel blue
     private Color buttonTextColor = Color.WHITE;
     private Color columnColor1 = new Color(245, 245, 245); // Light gray
     private Color columnColor2 = new Color(204, 229, 255); // Light blue
     private Color selectedRowColor = new Color(135, 206, 250); // Light sky blue
 
-    private Font labelFont = new Font("Arial", Font.BOLD, 14);
-    private Font buttonFont = new Font("Arial", Font.BOLD, 12);
+    private Font labelFont = new Font("Arial", Font.BOLD, 14); // Police pour les libellés
+    private Font buttonFont = new Font("Arial", Font.BOLD, 12); // Police pour les boutons
+    
 
     private Object[][] getTaskDataFromDatabase(String username) {
         String AgentFullName = getAgentFullName(username);
@@ -78,49 +81,6 @@ public class AgentDashboard extends JFrame {
         }
         return "";
     }
-
-    private void fetchTaskByTitle(String title, String username) {
-    Object[][] data = null;
-    try (Connection conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
-         Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-
-       String query = "SELECT id, Titre, Description, Superieur, 'N/A' as Comment, 'N/A' as Progression, 'N/A' as Response " +
-           "FROM tache WHERE Titre LIKE '%" + title + "%' AND Agent = '" + username + "'";
-
-        ResultSet rs = stmt.executeQuery(query);
-
-        rs.last();  // Move to the last row
-        int rowCount = rs.getRow();  // Get the row count
-        rs.beforeFirst();  // Move back to the first row
-
-        data = new Object[rowCount][7];
-        int i = 0;
-        while (rs.next()) {
-            data[i][0] = rs.getInt("id");
-            data[i][1] = rs.getString("Titre");
-            data[i][2] = rs.getString("Description");
-            data[i][3] = rs.getString("Superieur");
-            data[i][4] = rs.getString("Comment");
-            data[i][5] = rs.getString("Progression");
-            data[i][6] = rs.getString("reponse");
-            i++;
-        }
-
-        if (rowCount == 0) {
-            // Si aucun résultat n'est trouvé, définissez les données sur un tableau vide
-            data = new Object[0][7];
-        }
-
-        DefaultTableModel tableModel = new DefaultTableModel(data,
-                new String[]{"Task ID", "Title", "Description", "Superieur", "Comment", "Progression", "Reponse"});
-        taskTable.setModel(tableModel);
-        applyCustomCellRenderer();
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Error fetching data from database: " + e.getMessage());
-    }
-}
-
 
     private void applyCustomCellRenderer() {
         TableCellRenderer tableCellRenderer = new DefaultTableCellRenderer() {
@@ -197,46 +157,38 @@ public class AgentDashboard extends JFrame {
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.setBackground(panelColor);
-        JLabel searchLabel = new JLabel("Search Tasks by Title:");
+
+        JLabel searchLabel = new JLabel("Search:");
         searchLabel.setFont(labelFont);
-        taskTitleSearchField = new JTextField(10);
-        taskTitleSearchField.getDocument().addDocumentListener(new DocumentListener() {
+        searchPanel.add(searchLabel);
+
+        searchField = new JTextField();
+        searchField.setPreferredSize(new Dimension(150, 25));
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                searchTask();
+                searchTasks();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                searchTask();
+                searchTasks();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                searchTask();
-            }
-
-            private void searchTask() {
-                String taskTitleText = taskTitleSearchField.getText();
-                if (!taskTitleText.isEmpty()) {
-                    fetchTaskByTitle(taskTitleText, username);
-                } else {
-                    Object[][] data = getTaskDataFromDatabase(username);
-                    DefaultTableModel tableModel = new DefaultTableModel(data, columnNames);
-                    taskTable.setModel(tableModel);
-                    applyCustomCellRenderer();  // Apply custom cell renderer
-                }
+                searchTasks();
             }
         });
-        searchPanel.add(searchLabel);
-        searchPanel.add(taskTitleSearchField);
-        mainPanel.add(searchPanel, BorderLayout.NORTH);
+        searchPanel.add(searchField);
+
+        mainPanel.add(searchPanel, BorderLayout.WEST);
 
         JPanel buttonPanel = new JPanel(new BorderLayout(10, 10));
         buttonPanel.setBackground(panelColor);
 
-        JPanel fieldsPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-        fieldsPanel.setBackground(panelColor);
+        JPanel fieldsPanel = new JPanel(new GridLayout( 3, 2, 10, 10));
+           fieldsPanel.setBackground(panelColor);
 
         JLabel taskIdLabel = new JLabel("Task ID:");
         taskIdLabel.setFont(labelFont);
@@ -304,7 +256,7 @@ public class AgentDashboard extends JFrame {
 
     private void fetchCommentAndProgression(int taskId) {
         String query = "SELECT comment, progression, reponse FROM commentaires WHERE Id_Tache = ?";
-        try (Connection connection = DriverManager.getConnection(DATABASE_URL , DATABASE_USER , DATABASE_PASSWORD);
+        try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, taskId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -316,7 +268,6 @@ public class AgentDashboard extends JFrame {
                     switch (progression) {
                         case 0:
                             progressionComboBox.setSelectedItem("Not Started");
-                           
                             break;
                         case 1:
                             progressionComboBox.setSelectedItem("In Progress");
@@ -336,45 +287,59 @@ public class AgentDashboard extends JFrame {
         }
     }
 
-private void updateCommentInDatabase(int taskId, String comment, String progression, String username) {
-    try (Connection connection = DriverManager.getConnection(DATABASE_URL , DATABASE_USER , DATABASE_PASSWORD)) {
-        // Update comment in commentaires table
-        String updateQuery ="UPDATE commentaires SET Comment = ?, Progression = ?, Agent = ? WHERE Id_Tache = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-            preparedStatement.setString(1, comment);
-            // Calculate progression value
-            int calculatedProgression = calculateProgression(progression);
-            preparedStatement.setInt(2, calculatedProgression);
-            preparedStatement.setString(3, username);
-            preparedStatement.setInt(4, taskId);
-            preparedStatement.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Comment updated successfully.");
+    private void updateCommentInDatabase(int taskId, String comment, String progression, String username) {
+        try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD)) {
+            // Update comment in commentaires table
+            String updateQuery = "UPDATE commentaires SET Comment = ?, Progression = ?, Agent = ? WHERE Id_Tache = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+                preparedStatement.setString(1, comment);
+                // Calculate progression value
+                int calculatedProgression = calculateProgression(progression);
+                preparedStatement.setInt(2, calculatedProgression);
+                preparedStatement.setString(3, username);
+                preparedStatement.setInt(4, taskId);
+                preparedStatement.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Comment updated successfully.");
 
-            // Update the specific cells in the table instead of refreshing the entire table
-            int selectedRow = taskTable.getSelectedRow();
-            if (selectedRow != -1) {
-                // Update comment and progression columns
-                taskTable.setValueAt(comment, selectedRow, 4);
-                taskTable.setValueAt(progression, selectedRow, 5);
+                // Update the specific cells in the table instead of refreshing the entire table
+                int selectedRow = taskTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Update comment and progression columns
+                    taskTable.setValueAt(comment, selectedRow, 4);
+                    taskTable.setValueAt(progression, selectedRow, 5);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error updating comment: " + e.getMessage());
+        }
+    }
+
+    private int calculateProgression(String progressionLabel) {
+        switch (progressionLabel) {
+            case "Not Started":
+                return 0;
+            case "In Progress":
+                return 50;
+            case "Completed":
+                return 100;
+            default:
+                return 0;
+        }
+    }
+
+    private void searchTasks() {
+        String searchText = searchField.getText().trim();
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(taskTable.getModel());
+        taskTable.setRowSorter(sorter);
+        if (searchText.length() == 0) {
+            sorter.setRowFilter(null);
+        } else {
+            try {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
+            } catch (PatternSyntaxException e) {
+                e.printStackTrace();
             }
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Error updating comment: " + e.getMessage());
     }
-}
-private int calculateProgression(String progressionLabel) {
-    switch (progressionLabel) {
-        case "Not Started":
-            return 0;
-        case "In Progress":
-            return 50;
-        case "Completed":
-            return 100;
-        default:
-            return 0;
-    }
-}
-
-
 }
