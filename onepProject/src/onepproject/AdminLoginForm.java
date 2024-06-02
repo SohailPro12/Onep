@@ -91,6 +91,13 @@ public class AdminLoginForm {
         gbc.gridy = 3;
         adminFrame.add(messageLabel, gbc);
 
+        // Go Back Button
+        JButton goBackButton = new JButton("Go Back");
+        styleButton(goBackButton);
+        gbc.gridx = 2;
+        gbc.gridy = 4;
+        adminFrame.add(goBackButton, gbc);
+
         adminFrame.setVisible(true);
 
         adminFrame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -115,6 +122,15 @@ public class AdminLoginForm {
                 }
             }
         });
+
+        // Add action listener to go back button
+        goBackButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adminFrame.dispose();
+                parentFrame.setVisible(true);
+            }
+        });
     }
 
     private static boolean authenticateAdmin(String username, String password) {
@@ -134,7 +150,7 @@ public class AdminLoginForm {
 
     private static void styleButton(JButton button) {
         button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(70, 130, 180));
+        button.setBackground(new Color(10, 130, 180));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
     }
