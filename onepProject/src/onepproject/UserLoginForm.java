@@ -25,31 +25,30 @@ public class UserLoginForm {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Add image
-try {
-    URL imageUrl = new URL("https://i.ibb.co/YXyW9Zt/Onep-svg.png");
-    ImageIcon originalIcon = new ImageIcon(imageUrl);
+        try {
+            URL imageUrl = new URL("https://i.ibb.co/YXyW9Zt/Onep-svg.png");
+            ImageIcon originalIcon = new ImageIcon(imageUrl);
     
-    // Get the width and height of the original image
-    int originalWidth = originalIcon.getIconWidth();
-    int originalHeight = originalIcon.getIconHeight();
+            // Get the width and height of the original image
+            int originalWidth = originalIcon.getIconWidth();
+            int originalHeight = originalIcon.getIconHeight();
     
-    // Calculate the width and height to fit the left part of the frame
-    int targetWidth = 300; // Adjust this as needed
-    int targetHeight = (int) Math.round((double) targetWidth / originalWidth * originalHeight);
+            // Calculate the width and height to fit the left part of the frame
+            int targetWidth = 300; // Adjust this as needed
+            int targetHeight = (int) Math.round((double) targetWidth / originalWidth * originalHeight);
     
-    // Resize the image to fit the target dimensions
-    ImageIcon resizedIcon = new ImageIcon(originalIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT));
+            // Resize the image to fit the target dimensions
+            ImageIcon resizedIcon = new ImageIcon(originalIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT));
 
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.gridheight = GridBagConstraints.REMAINDER; // Span the entire height
-    gbc.gridwidth = 1; // Only occupy one column
-    JLabel imageLabel = new JLabel(resizedIcon);
-    userFrame.add(imageLabel, gbc);
-} catch (Exception e) {
-    e.printStackTrace();
-}
-
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridheight = GridBagConstraints.REMAINDER; // Span the entire height
+            gbc.gridwidth = 1; // Only occupy one column
+            JLabel imageLabel = new JLabel(resizedIcon);
+            userFrame.add(imageLabel, gbc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         gbc.gridheight = 1;
         gbc.gridx = 1;
@@ -81,9 +80,14 @@ try {
         styleButton(forgotPasswordButton);
         userFrame.add(forgotPasswordButton, gbc);
 
+        gbc.gridy = 4;
+        JButton goBackButton = new JButton("Go Back");
+        styleButton(goBackButton);
+        userFrame.add(goBackButton, gbc);
+
         JLabel messageLabel = new JLabel("");
         messageLabel.setForeground(Color.RED);
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         userFrame.add(messageLabel, gbc);
 
         userFrame.setVisible(true);
@@ -106,6 +110,13 @@ try {
             public void actionPerformed(ActionEvent e) {
                 userFrame.dispose();
                 showForgotPasswordForm(parentFrame);
+            }
+        });
+
+        goBackButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                userFrame.dispose();
+                parentFrame.setVisible(true);
             }
         });
 

@@ -12,7 +12,7 @@ import javax.imageio.ImageIO;
 public class OnepProject {
     public static void main(String[] args) {
         // Create the main frame
-        JFrame mainFrame = new JFrame("Main Form");
+        JFrame mainFrame = new JFrame("Onep");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(1000, 600); // Set the fixed size
         mainFrame.setLocationRelativeTo(null); // Center the window
@@ -77,7 +77,7 @@ public class OnepProject {
         headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 
         // Footer
-        JLabel footerLabel = new JLabel("© 2024 One Project Inc.", SwingConstants.CENTER);
+        JLabel footerLabel = new JLabel("© 2024 Onep Project Inc.", SwingConstants.CENTER);
         footerLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         footerLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
 

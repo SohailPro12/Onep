@@ -146,7 +146,7 @@ public class SuperieurDashboard {
         // Response field
         gbc.gridy = 12;
         gbc.gridheight = 1;
-        topPanel.add(new JLabel("Response:"), gbc);
+        topPanel.add(new JLabel("Reponse:"), gbc);
 
         gbc.gridy = 13;
         JTextField responseField = new JTextField(20);
@@ -155,7 +155,7 @@ public class SuperieurDashboard {
         // Button to save the response
         gbc.gridy = 14;
         gbc.gridwidth = 1;
-        JButton saveResponseButton = new JButton("Save Response");
+        JButton saveResponseButton = new JButton("Enregistrer la réponse");
         topPanel.add(saveResponseButton, gbc);
 
         mainPanel.add(topPanel, BorderLayout.WEST);
@@ -185,7 +185,7 @@ public class SuperieurDashboard {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        JLabel searchLabel = new JLabel("Search by Task ID:");
+        JLabel searchLabel = new JLabel("Recherche par ID de tâche :");
         searchPanel.add(searchLabel, gbc);
 
         gbc.gridx = 1;
@@ -195,7 +195,7 @@ public class SuperieurDashboard {
         // Search by Agent Name
         gbc.gridx = 0;
         gbc.gridy = 1;
-        JLabel searchAgentLabel = new JLabel("Search by Agent Name:");
+        JLabel searchAgentLabel = new JLabel("Recherche par nom d’agent :");
         searchPanel.add(searchAgentLabel, gbc);
 
         gbc.gridx = 1;
