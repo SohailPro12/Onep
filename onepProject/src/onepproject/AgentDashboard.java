@@ -187,8 +187,8 @@ public class AgentDashboard extends JFrame {
         JPanel buttonPanel = new JPanel(new BorderLayout(10, 10));
         buttonPanel.setBackground(panelColor);
 
-        JPanel fieldsPanel = new JPanel(new GridLayout( 3, 2, 10, 10));
-           fieldsPanel.setBackground(panelColor);
+        JPanel fieldsPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        fieldsPanel.setBackground(panelColor);
 
         JLabel taskIdLabel = new JLabel("Task ID:");
         taskIdLabel.setFont(labelFont);
@@ -234,6 +234,23 @@ public class AgentDashboard extends JFrame {
             }
         });
         buttonsSubPanel.add(sendCommentButton);
+
+        JButton expandButton = new JButton("Expand");
+        expandButton.setBackground(buttonColor);
+        expandButton.setForeground(buttonTextColor);
+        expandButton.setFont(buttonFont);
+        expandButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = taskTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    int taskId = Integer.parseInt(taskTable.getValueAt(selectedRow, 0).toString());
+                    showTaskDetails(taskId);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please select a task to expand.");
+                }
+            }
+        });
+        buttonsSubPanel.add(expandButton);
 
         JButton logoutButton = new JButton("Logout");
         logoutButton.setBackground(buttonColor);
@@ -342,4 +359,76 @@ public class AgentDashboard extends JFrame {
             }
         }
     }
+
+ private void showTaskDetails(int taskId) {
+    JDialog detailDialog = new JDialog(this, "Task Details", true);
+    detailDialog.setSize(500, 400);
+    detailDialog.setLocationRelativeTo(this);
+
+    JPanel detailPanel = new JPanel(new GridBagLayout());
+    detailPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    detailPanel.setBackground(backgroundColor);
+
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(10, 10, 10, 10);
+    gbc.anchor = GridBagConstraints.WEST;
+
+    // Fetch task details from the database
+    String query = "SELECT * FROM tache WHERE id = ?";
+    try (Connection connection = DriverManager.getConnection(DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD);
+         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        preparedStatement.setInt(1, taskId);
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                String title = resultSet.getString("Titre");
+                String description = resultSet.getString("Description");
+                String superieur = resultSet.getString("Superieur");
+                String agent = resultSet.getString("Agent");
+
+                addDetail(detailPanel, gbc, "Task ID: ", String.valueOf(taskId), 0);
+                addDetail(detailPanel, gbc, "Title: ", title, 1);
+                addDetail(detailPanel, gbc, "Description: ", description, 2);
+                addDetail(detailPanel, gbc, "Superieur: ", superieur, 3);
+                addDetail(detailPanel, gbc, "Agent: ", agent, 4);
+
+                // Fetch comments, progression, and response
+                String commentQuery = "SELECT comment, progression, reponse FROM commentaires WHERE Id_Tache = ?";
+                try (PreparedStatement commentStmt = connection.prepareStatement(commentQuery)) {
+                    commentStmt.setInt(1, taskId);
+                    try (ResultSet commentRs = commentStmt.executeQuery()) {
+                        if (commentRs.next()) {
+                            String comment = commentRs.getString("comment");
+                            String progression = commentRs.getString("progression");
+                            String reponse = commentRs.getString("reponse");
+
+                            addDetail(detailPanel, gbc, "Comment: ", comment, 5);
+                            addDetail(detailPanel, gbc, "Progression: ", progression, 6);
+                            addDetail(detailPanel, gbc, "Response: ", reponse, 7);
+                        }
+                    }
+                }
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error fetching task details: " + e.getMessage());
+    }
+
+    detailDialog.add(detailPanel);
+    detailDialog.setVisible(true);
+}
+
+private void addDetail(JPanel panel, GridBagConstraints gbc, String label, String value, int row) {
+    gbc.gridx = 0;
+    gbc.gridy = row;
+    JLabel labelComponent = new JLabel(label);
+    labelComponent.setFont(labelFont);
+    panel.add(labelComponent, gbc);
+
+    gbc.gridx = 1;
+    JLabel valueComponent = new JLabel(value);
+    valueComponent.setFont(new Font("Arial", Font.PLAIN, 14));
+    valueComponent.setForeground(Color.DARK_GRAY);
+    panel.add(valueComponent, gbc);
+}
 }
