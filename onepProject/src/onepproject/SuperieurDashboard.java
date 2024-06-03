@@ -46,7 +46,7 @@ public class SuperieurDashboard {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        JLabel taskFormLabel = new JLabel("Task Form");
+        JLabel taskFormLabel = new JLabel("Bienvenue a Gestion des Tâches ,"+username, JLabel.CENTER);
         taskFormLabel.setFont(new Font("Arial", Font.BOLD, 20));
         taskFormLabel.setForeground(new Color(0, 102, 204));
         topPanel.add(taskFormLabel, gbc);
@@ -118,9 +118,17 @@ public class SuperieurDashboard {
         gbc.gridwidth = 2;
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JButton addButton = new JButton("Ajouter");
+        addButton.setBackground(new Color(70,130,180));
+        addButton.setForeground(new Color(255,255,255));
         JButton deleteButton = new JButton("Supprimer");
+        deleteButton.setBackground(new Color(70,130,180));
+        deleteButton.setForeground(new Color(255,255,255));
         JButton modifyButton = new JButton("Modifier");
+        modifyButton.setBackground(new Color(70,130,180));
+        modifyButton.setForeground(new Color(255,255,255));
         JButton clearButton = new JButton("Clear");
+        clearButton.setBackground(new Color(70,130,180));
+        clearButton.setForeground(new Color(255,255,255));
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(modifyButton);
@@ -156,6 +164,8 @@ public class SuperieurDashboard {
         gbc.gridy = 14;
         gbc.gridwidth = 1;
         JButton saveResponseButton = new JButton("Enregistrer la réponse");
+        saveResponseButton.setBackground(new Color(70,130,180));
+        saveResponseButton.setForeground(new Color(255,255,255));
         topPanel.add(saveResponseButton, gbc);
 
         mainPanel.add(topPanel, BorderLayout.WEST);
@@ -175,7 +185,9 @@ public class SuperieurDashboard {
         rightPanel.add(scrollPane, BorderLayout.CENTER);
 
         // Expand button next to DataGrid view
-        JButton expandButton = new JButton("Expand");
+        JButton expandButton = new JButton("Agrandir");
+        expandButton.setBackground(new Color(255, 0, 0));
+        expandButton.setForeground(new Color(255,255,255));
         rightPanel.add(expandButton, BorderLayout.SOUTH);
 
         // Search Panel
@@ -208,7 +220,11 @@ public class SuperieurDashboard {
         gbc.gridwidth = 2;
         JPanel statsCredButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JButton statsButton = new JButton("Statistiques");
+        statsButton.setBackground(new Color(70,130,180));
+        statsButton.setForeground(new Color(255,255,255));
         JButton viewCredentialsButton = new JButton("View Credentials");
+        viewCredentialsButton.setBackground(new Color(70,130,180));
+        viewCredentialsButton.setForeground(new Color(255,255,255));
         statsCredButtonPanel.add(statsButton);
         statsCredButtonPanel.add(viewCredentialsButton);
         searchPanel.add(statsCredButtonPanel, gbc);
@@ -221,6 +237,8 @@ public class SuperieurDashboard {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.setBackground(new Color(240, 240, 240));
         JButton logoutButton = new JButton("Logout");
+        logoutButton.setBackground(new Color(70,130,180));
+        logoutButton.setForeground(new Color(255,255,255));
         bottomPanel.add(logoutButton);
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
