@@ -175,7 +175,7 @@ public class SuperieurDashboard {
         rightPanel.setBackground(new Color(240, 240, 240));
 
         // DataGrid view
-        String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
+        String[] columnNames = {"ID de tâche", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable taskTable = new JTable(tableModel);
         taskTable.setBackground(new Color(255, 255, 204));
@@ -222,7 +222,7 @@ public class SuperieurDashboard {
         JButton statsButton = new JButton("Statistiques");
         statsButton.setBackground(new Color(70,130,180));
         statsButton.setForeground(new Color(255,255,255));
-        JButton viewCredentialsButton = new JButton("View Credentials");
+        JButton viewCredentialsButton = new JButton("Afficher les informations d'identification");
         viewCredentialsButton.setBackground(new Color(70,130,180));
         viewCredentialsButton.setForeground(new Color(255,255,255));
         statsCredButtonPanel.add(statsButton);
@@ -308,7 +308,7 @@ public class SuperieurDashboard {
         });
 
         expandButton.addActionListener(e -> {
-            JFrame expandFrame = new JFrame("Expanded DataGrid View");
+            JFrame expandFrame = new JFrame("DataGridView étendu");
             expandFrame.setSize(1000, 600);
             JTable expandedTable = new JTable(tableModel);
             expandFrame.add(new JScrollPane(expandedTable));
