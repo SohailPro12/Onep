@@ -14,6 +14,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+
 public class SuperieurDashboard {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/onep_db";
     private static final String DB_USERNAME = "root";
@@ -46,9 +47,9 @@ public class SuperieurDashboard {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        JLabel taskFormLabel = new JLabel("Task Form");
+        JLabel taskFormLabel = new JLabel("Bienvenue à la Gestion des Tâches ,"+username, JLabel.CENTER);
         taskFormLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        taskFormLabel.setForeground(new Color(0, 102, 204));
+        taskFormLabel.setForeground(new Color(70, 130, 180));
         topPanel.add(taskFormLabel, gbc);
 
         gbc.gridwidth = 1;
@@ -118,9 +119,19 @@ public class SuperieurDashboard {
         gbc.gridwidth = 2;
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JButton addButton = new JButton("Ajouter");
+        addButton.setBackground(new Color(70,130,180));
+        addButton.setForeground(new Color(255,255,255));
         JButton deleteButton = new JButton("Supprimer");
+        deleteButton.setForeground(new Color(255,255,255));
+        deleteButton.setBackground(new Color(70,130,180));
         JButton modifyButton = new JButton("Modifier");
+        modifyButton.setBackground(new Color(70,130,180));
+        modifyButton.setForeground(new Color(255,255,255));
+
         JButton clearButton = new JButton("Clear");
+        clearButton.setBackground(new Color(70,130,180));
+        clearButton.setForeground(new Color(255,255,255));
+
         buttonPanel.add(addButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(modifyButton);
@@ -156,6 +167,8 @@ public class SuperieurDashboard {
         gbc.gridy = 14;
         gbc.gridwidth = 1;
         JButton saveResponseButton = new JButton("Enregistrer la réponse");
+        saveResponseButton.setBackground(new Color(70,130,180));
+        saveResponseButton.setForeground(new Color(255,255,255));
         topPanel.add(saveResponseButton, gbc);
 
         mainPanel.add(topPanel, BorderLayout.WEST);
@@ -165,7 +178,7 @@ public class SuperieurDashboard {
         rightPanel.setBackground(new Color(240, 240, 240));
 
         // DataGrid view
-        String[] columnNames = {"Task ID", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
+        String[] columnNames = {"ID de tâche", "Title", "Description", "Agent", "Budget", "Commentaires", "Progression"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable taskTable = new JTable(tableModel);
         taskTable.setBackground(new Color(255, 255, 204));
@@ -175,7 +188,9 @@ public class SuperieurDashboard {
         rightPanel.add(scrollPane, BorderLayout.CENTER);
 
         // Expand button next to DataGrid view
-        JButton expandButton = new JButton("Expand");
+        JButton expandButton = new JButton("Agrandir");
+        expandButton.setBackground(new Color(255,0,0));
+        expandButton.setForeground(new Color(255, 255,255));
         rightPanel.add(expandButton, BorderLayout.SOUTH);
 
         // Search Panel
@@ -208,7 +223,11 @@ public class SuperieurDashboard {
         gbc.gridwidth = 2;
         JPanel statsCredButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         JButton statsButton = new JButton("Statistiques");
-        JButton viewCredentialsButton = new JButton("View Credentials");
+        statsButton.setBackground(new Color(70,130,180));
+        statsButton.setForeground(new Color(255,255,255));
+        JButton viewCredentialsButton = new JButton("Afficher les informations d'identification");
+        viewCredentialsButton.setBackground(new Color(70,130,180));
+        viewCredentialsButton.setForeground(new Color(255,255,255));
         statsCredButtonPanel.add(statsButton);
         statsCredButtonPanel.add(viewCredentialsButton);
         searchPanel.add(statsCredButtonPanel, gbc);
@@ -221,6 +240,8 @@ public class SuperieurDashboard {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.setBackground(new Color(240, 240, 240));
         JButton logoutButton = new JButton("Logout");
+        logoutButton.setBackground(new Color(70,130,180));
+        logoutButton.setForeground(new Color(255,255,255));
         bottomPanel.add(logoutButton);
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -290,7 +311,7 @@ public class SuperieurDashboard {
         });
 
         expandButton.addActionListener(e -> {
-            JFrame expandFrame = new JFrame("Expanded DataGrid View");
+            JFrame expandFrame = new JFrame("DataGridView étendu");
             expandFrame.setSize(1000, 600);
             JTable expandedTable = new JTable(tableModel);
             expandFrame.add(new JScrollPane(expandedTable));

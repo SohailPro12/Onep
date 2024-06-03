@@ -274,26 +274,4 @@ private void addPlaceholderStyle(JTextField textField, String placeholder) {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            JFrame frame = new JFrame("Test");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(600, 400);
-            frame.setLocationRelativeTo(null);
-
-            JButton openButton = new JButton("Ouvrir le formulaire");
-            openButton.addActionListener(e -> {
-                CreateAccountForm form = new CreateAccountForm(frame);
-                form.setVisible(true);
-            });
-
-            frame.add(openButton);
-            frame.setVisible(true);
-        });
-    }
 }
