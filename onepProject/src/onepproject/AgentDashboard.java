@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 import java.util.regex.PatternSyntaxException;
+import java.awt.Color;
+
 
 public class AgentDashboard extends JFrame {
 
@@ -25,10 +27,13 @@ public class AgentDashboard extends JFrame {
     private Color backgroundColor = new Color(250, 250, 250); // Very light gray
     private Color panelColor = new Color(245, 245, 245); // Slightly darker gray
     private Color buttonColor = new Color(70, 130, 180); // Steel blue
+    private Color buttonColor2 = new Color(255, 0, 0); // Rouge pur
+
     private Color buttonTextColor = Color.WHITE;
     private Color columnColor1 = new Color(255, 255, 255); // White
     private Color columnColor2 = new Color(230, 230, 250); // Lavender
     private Color selectedRowColor = new Color(173, 216, 230); // Light blue
+    private Color customColor = new Color (70, 130, 180);
 
     private Font labelFont = new Font("Arial", Font.BOLD, 14);
     private Font buttonFont = new Font("Arial", Font.BOLD, 12);
@@ -123,6 +128,7 @@ public class AgentDashboard extends JFrame {
         mainPanel.setBackground(backgroundColor);
 
         JLabel welcomeLabel = new JLabel("Bienvenue a Votre Gestion des Tâches ,"+username, JLabel.CENTER);
+        welcomeLabel.setForeground(customColor);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
@@ -238,8 +244,8 @@ public class AgentDashboard extends JFrame {
         });
         buttonsSubPanel.add(sendCommentButton);
 
-        JButton expandButton = new JButton("Expand");
-        expandButton.setBackground(buttonColor);
+        JButton expandButton = new JButton("Agrandir");
+        expandButton.setBackground(buttonColor2);
         expandButton.setForeground(buttonTextColor);
         expandButton.setFont(buttonFont);
         expandButton.addActionListener(new ActionListener() {
