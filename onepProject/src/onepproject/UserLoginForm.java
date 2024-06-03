@@ -412,6 +412,7 @@ public class UserLoginForm {
                 String newPassword = new String(newPasswordField.getPassword());
                 String confirmPassword = new String(confirmPasswordField.getPassword());
                 if (newPassword.equals(confirmPassword)) {
+                    System.out.println(username+" "+newPassword);
                     if (resetUserPassword(username, newPassword)) {
                         messageLabel.setForeground(Color.GREEN);
                         messageLabel.setText("Password reset successfully.");
@@ -434,19 +435,36 @@ public class UserLoginForm {
         });
     }
 
-    private static boolean resetUserPassword(String username, String newPassword) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "UPDATE Agent SET pass = ? WHERE login = ? UNION UPDATE superieur SET pass = ? WHERE login = ?";
+    private static boolean resetUserPassword(String username, String newPassword) {    
+         String role = getUserRole(username);
+        if (role.equals("superieur")) {
+            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "UPDATE superieur SET pass = ? WHERE login = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, newPassword);
                 stmt.setString(2, username);
-                stmt.setString(3, newPassword);
-                stmt.setString(4, username);
                 int affectedRows = stmt.executeUpdate();
                 return affectedRows > 0;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
+        }
+        } else if (role.equals("agent")) {
+            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "UPDATE Agent SET pass = ? WHERE login = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, newPassword);
+                stmt.setString(2, username);
+                int affectedRows = stmt.executeUpdate();
+                return affectedRows > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        } else {
+            JOptionPane.showMessageDialog(null, "Problem happen");
             return false;
         }
     }
