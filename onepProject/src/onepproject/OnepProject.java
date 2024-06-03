@@ -54,7 +54,7 @@ public class OnepProject {
         // Header with Logo
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        JLabel headerLabel = new JLabel("Welcome to CoordiTeam", SwingConstants.CENTER);
+        JLabel headerLabel = new JLabel("<html>Bienvenue chez <span style='color:#4682B4;'>CoordiTeam</span></html>", SwingConstants.CENTER);
         headerLabel.setFont(new Font("Arial", Font.BOLD, 25));
         headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
