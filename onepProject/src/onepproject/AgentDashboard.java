@@ -16,21 +16,24 @@ public class AgentDashboard extends JFrame {
 
     private JLabel taskIdValueLabel;
     private JTextField commentField;
-    private JComboBox<String> progressionComboBox;
+    private JComboBox<String> progressionComboBox ;
+
     private JTable taskTable;
     private JTextField searchField; // Added search field
 
-    private Color backgroundColor = new Color(245, 245, 245); // Light gray
-    private Color panelColor = new Color(240, 240, 240); // Couleur de fond pour les panneaux
 
+    private Color backgroundColor = new Color(250, 250, 250); // Very light gray
+    private Color panelColor = new Color(245, 245, 245); // Slightly darker gray
     private Color buttonColor = new Color(70, 130, 180); // Steel blue
     private Color buttonTextColor = Color.WHITE;
-    private Color columnColor1 = new Color(245, 245, 245); // Light gray
-    private Color columnColor2 = new Color(204, 229, 255); // Light blue
-    private Color selectedRowColor = new Color(135, 206, 250); // Light sky blue
+    private Color columnColor1 = new Color(255, 255, 255); // White
+    private Color columnColor2 = new Color(230, 230, 250); // Lavender
+    private Color selectedRowColor = new Color(173, 216, 230); // Light blue
 
-    private Font labelFont = new Font("Arial", Font.BOLD, 14); // Police pour les libellés
-    private Font buttonFont = new Font("Arial", Font.BOLD, 12); // Police pour les boutons
+    private Font labelFont = new Font("Arial", Font.BOLD, 14);
+    private Font buttonFont = new Font("Arial", Font.BOLD, 12);
+    
+
     
 
     private Object[][] getTaskDataFromDatabase(String username) {
@@ -60,7 +63,7 @@ public class AgentDashboard extends JFrame {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error fetching data from database: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erreur lors de la récupération des données de la base de données: " + e.getMessage());
         }
         return data;
     }
@@ -110,7 +113,7 @@ public class AgentDashboard extends JFrame {
     }
 
     public AgentDashboard(String username) {
-        setTitle("Agent Dashboard - Welcome " + username);
+        setTitle("Tableau de bord des agents ");
         setSize(1000, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -119,11 +122,11 @@ public class AgentDashboard extends JFrame {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(backgroundColor);
 
-        JLabel welcomeLabel = new JLabel("Welcome to the Agent Dashboard", JLabel.CENTER);
+        JLabel welcomeLabel = new JLabel("Bienvenue a Votre Gestion des Tâches ,"+username, JLabel.CENTER);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
-        String[] columnNames = {"Task ID", "Title", "Description", "Superieur", "Comment", "Progression", "Response"};
+        String[] columnNames = {"ID de tâche", "Title", "Description", "Superieur", "Commentaires", "Progression", "Response"};
         Object[][] data = getTaskDataFromDatabase(username);
 
         DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
@@ -158,7 +161,7 @@ public class AgentDashboard extends JFrame {
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchPanel.setBackground(panelColor);
 
-        JLabel searchLabel = new JLabel("Search:");
+        JLabel searchLabel = new JLabel("Recherche:");
         searchLabel.setFont(labelFont);
         searchPanel.add(searchLabel);
 
@@ -190,14 +193,14 @@ public class AgentDashboard extends JFrame {
         JPanel fieldsPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         fieldsPanel.setBackground(panelColor);
 
-        JLabel taskIdLabel = new JLabel("Task ID:");
+        JLabel taskIdLabel = new JLabel("ID de tâche:");
         taskIdLabel.setFont(labelFont);
         taskIdValueLabel = new JLabel("");
         taskIdValueLabel.setFont(labelFont);
         fieldsPanel.add(taskIdLabel);
         fieldsPanel.add(taskIdValueLabel);
 
-        JLabel commentLabel = new JLabel("Comment:");
+        JLabel commentLabel = new JLabel("Commentaire:");
         commentLabel.setFont(labelFont);
         commentField = new JTextField();
         commentField.setPreferredSize(new Dimension(100, 25));
@@ -206,7 +209,7 @@ public class AgentDashboard extends JFrame {
 
         JLabel progressionLabel = new JLabel("Progression:");
         progressionLabel.setFont(labelFont);
-        String[] progressionOptions = {"Not Started", "In Progress", "Completed"};
+        String[] progressionOptions = {"Pas commencé", "En cours", "Complété"};
         progressionComboBox = new JComboBox<>(progressionOptions);
         fieldsPanel.add(progressionLabel);
         fieldsPanel.add(progressionComboBox);
@@ -216,7 +219,7 @@ public class AgentDashboard extends JFrame {
         JPanel buttonsSubPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonsSubPanel.setBackground(panelColor);
 
-        JButton sendCommentButton = new JButton("Send");
+        JButton sendCommentButton = new JButton("Envoyer");
         sendCommentButton.setBackground(buttonColor);
         sendCommentButton.setForeground(buttonTextColor);
         sendCommentButton.setFont(buttonFont);
@@ -229,7 +232,7 @@ public class AgentDashboard extends JFrame {
                     String progression = progressionComboBox.getSelectedItem().toString();
                     updateCommentInDatabase(taskId, comment, progression, username);
                 } else {
-                    JOptionPane.showMessageDialog(null, "Please select a task to comment on.");
+                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner une tâche sur laquelle commenter.");
                 }
             }
         });
@@ -246,7 +249,7 @@ public class AgentDashboard extends JFrame {
                     int taskId = Integer.parseInt(taskTable.getValueAt(selectedRow, 0).toString());
                     showTaskDetails(taskId);
                 } else {
-                    JOptionPane.showMessageDialog(null, "Please select a task to expand.");
+                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner une tâche svp.");
                 }
             }
         });
@@ -284,16 +287,16 @@ public class AgentDashboard extends JFrame {
                     commentField.setText(comment);
                     switch (progression) {
                         case 0:
-                            progressionComboBox.setSelectedItem("Not Started");
+                            progressionComboBox.setSelectedItem("");
                             break;
                         case 1:
-                            progressionComboBox.setSelectedItem("In Progress");
+                            progressionComboBox.setSelectedItem("En cours");
                             break;
                         case 2:
-                            progressionComboBox.setSelectedItem("Completed");
+                            progressionComboBox.setSelectedItem("Complété");
                             break;
                         default:
-                            progressionComboBox.setSelectedItem("Not Started");
+                            progressionComboBox.setSelectedItem("Pas commencé");
                             break;
                     }
                 }
@@ -316,7 +319,7 @@ public class AgentDashboard extends JFrame {
                 preparedStatement.setString(3, username);
                 preparedStatement.setInt(4, taskId);
                 preparedStatement.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Comment updated successfully.");
+                JOptionPane.showMessageDialog(null, "Commentaire mis à jour avec succès.");
 
                 // Update the specific cells in the table instead of refreshing the entire table
                 int selectedRow = taskTable.getSelectedRow();
@@ -328,17 +331,17 @@ public class AgentDashboard extends JFrame {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error updating comment: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erreur lors de la mise à jour du commentaire : " + e.getMessage());
         }
     }
 
     private int calculateProgression(String progressionLabel) {
         switch (progressionLabel) {
-            case "Not Started":
+            case "Pas commencé":
                 return 0;
-            case "In Progress":
+            case "En cours":
                 return 50;
-            case "Completed":
+            case "Complété":
                 return 100;
             default:
                 return 0;
@@ -361,7 +364,7 @@ public class AgentDashboard extends JFrame {
     }
 
  private void showTaskDetails(int taskId) {
-    JDialog detailDialog = new JDialog(this, "Task Details", true);
+    JDialog detailDialog = new JDialog(this, "Détails de la tâche", true);
     detailDialog.setSize(500, 400);
     detailDialog.setLocationRelativeTo(this);
 
@@ -385,8 +388,8 @@ public class AgentDashboard extends JFrame {
                 String superieur = resultSet.getString("Superieur");
                 String agent = resultSet.getString("Agent");
 
-                addDetail(detailPanel, gbc, "Task ID: ", String.valueOf(taskId), 0);
-                addDetail(detailPanel, gbc, "Title: ", title, 1);
+                addDetail(detailPanel, gbc, "ID de tâche: ", String.valueOf(taskId), 0);
+                addDetail(detailPanel, gbc, "Titre: ", title, 1);
                 addDetail(detailPanel, gbc, "Description: ", description, 2);
                 addDetail(detailPanel, gbc, "Superieur: ", superieur, 3);
                 addDetail(detailPanel, gbc, "Agent: ", agent, 4);
@@ -401,9 +404,9 @@ public class AgentDashboard extends JFrame {
                             String progression = commentRs.getString("progression");
                             String reponse = commentRs.getString("reponse");
 
-                            addDetail(detailPanel, gbc, "Comment: ", comment, 5);
+                            addDetail(detailPanel, gbc, "Commentaire: ", comment, 5);
                             addDetail(detailPanel, gbc, "Progression: ", progression, 6);
-                            addDetail(detailPanel, gbc, "Response: ", reponse, 7);
+                            addDetail(detailPanel, gbc, "Reponse: ", reponse, 7);
                         }
                     }
                 }
@@ -411,7 +414,7 @@ public class AgentDashboard extends JFrame {
         }
     } catch (SQLException e) {
         e.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Error fetching task details: " + e.getMessage());
+        JOptionPane.showMessageDialog(null, "Erreur lors de la récupération des détails de la tâche: " + e.getMessage());
     }
 
     detailDialog.add(detailPanel);
