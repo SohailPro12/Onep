@@ -127,9 +127,9 @@ public class AgentDashboard extends JFrame {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(backgroundColor);
 
-        JLabel welcomeLabel = new JLabel("Bienvenue à Votre Gestion des Tâches ,"+username, JLabel.CENTER);
+        JLabel welcomeLabel = new JLabel("Bienvenue a Votre Gestion des Tâches ,"+username, JLabel.CENTER);
         welcomeLabel.setForeground(customColor);
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
         String[] columnNames = {"ID de tâche", "Title", "Description", "Superieur", "Commentaires", "Progression", "Response"};
