@@ -48,7 +48,7 @@ public class SuperieurDashboard {
         gbc.gridwidth = 2;
         JLabel taskFormLabel = new JLabel("Bienvenue a Gestion des Tâches ,"+username, JLabel.CENTER);
         taskFormLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        taskFormLabel.setForeground(new Color(0, 102, 204));
+        taskFormLabel.setForeground(new Color(70, 130, 180));
         topPanel.add(taskFormLabel, gbc);
 
         gbc.gridwidth = 1;
