@@ -49,7 +49,7 @@ public class AdminDashboard {
         table.setRowHeight(30);
         table.setFont(new Font("SansSerif", Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(0, 102, 204)); // Blue header
+        table.getTableHeader().setBackground(new Color(70, 130, 180)); // Steel blue
         table.getTableHeader().setForeground(Color.WHITE);
 
         // Custom cell renderer for alternating row colors and selected row color
@@ -80,7 +80,7 @@ public class AdminDashboard {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JButton logoutButton = new JButton("Logout");
         JButton createAccountButton = new JButton("Create Account");
-        JButton doneButton = new JButton("Done");
+        JButton doneButton = new JButton("Fait");
 
         logoutButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         createAccountButton.setFont(new Font("SansSerif", Font.BOLD, 14));
