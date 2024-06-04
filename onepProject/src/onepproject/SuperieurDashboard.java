@@ -145,6 +145,7 @@ public class SuperieurDashboard {
         gbc.gridy = 10;
         gbc.gridheight = 2;
         JTextArea detailArea = new JTextArea(5, 20);
+
         detailArea.setLineWrap(true);
         detailArea.setWrapStyleWord(true);
         detailArea.setEditable(false);

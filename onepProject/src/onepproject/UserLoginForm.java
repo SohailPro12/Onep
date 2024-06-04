@@ -76,7 +76,7 @@ public class UserLoginForm {
         userFrame.add(userLoginButton, gbc);
 
         gbc.gridy = 3;
-        JButton forgotPasswordButton = new JButton("Forgot Password");
+        JButton forgotPasswordButton = new JButton("Mot de passe oublié");
         styleButton(forgotPasswordButton);
         userFrame.add(forgotPasswordButton, gbc);
 
@@ -84,6 +84,11 @@ public class UserLoginForm {
         JButton goBackButton = new JButton("Go Back");
         styleButton(goBackButton);
         userFrame.add(goBackButton, gbc);
+        
+        gbc.gridy = 5;
+        JButton goAdminButton = new JButton("Je suis un administrateur");
+        styleButton(goAdminButton);
+        userFrame.add(goAdminButton, gbc);
 
         JLabel messageLabel = new JLabel("");
         messageLabel.setForeground(Color.RED);
@@ -114,11 +119,19 @@ public class UserLoginForm {
         });
 
         goBackButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 userFrame.dispose();
                 parentFrame.setVisible(true);
             }
         });
+        goAdminButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                userFrame.setVisible(false);
+                AdminLoginForm.showAdminLoginForm(userFrame);
+            }
+        });
+
 
         userFrame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override

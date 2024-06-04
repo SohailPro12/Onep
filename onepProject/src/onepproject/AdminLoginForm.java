@@ -94,9 +94,13 @@ public class AdminLoginForm {
         // Go Back Button
         JButton goBackButton = new JButton("Go Back");
         styleButton(goBackButton);
-        gbc.gridx = 2;
         gbc.gridy = 4;
         adminFrame.add(goBackButton, gbc);
+        
+        JButton goUserButton = new JButton("Je suis un Utilisateur");
+        styleButton(goUserButton);
+        gbc.gridy = 5;
+        adminFrame.add(goUserButton, gbc);
 
         adminFrame.setVisible(true);
 
@@ -129,6 +133,13 @@ public class AdminLoginForm {
             public void actionPerformed(ActionEvent e) {
                 adminFrame.dispose();
                 parentFrame.setVisible(true);
+            }
+        });
+        
+        goUserButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                adminFrame.setVisible(false);
+                UserLoginForm.showUserLoginForm(adminFrame);
             }
         });
     }
