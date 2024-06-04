@@ -26,12 +26,12 @@ public class AdminDashboard {
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         adminDashboardFrame.add(titleLabel, BorderLayout.NORTH);
 
-        String[] columnNames = {"Login", "Gmail", "Numero", "Selectionner"};
+        String[] columnNames = {"Login", "Gmail", "Numero","Code de recuperation", "Selectionner"};
         Object[][] data = fetchDataFromDatabase();
 
         DefaultTableModel model = new DefaultTableModel(data, columnNames) {
-            Class[] types = new Class[]{String.class, String.class, String.class, Boolean.class};
-            boolean[] canEdit = new boolean[]{false, false, false, true};
+            Class[] types = new Class[]{String.class, String.class, String.class,Integer.class ,Boolean.class};
+            boolean[] canEdit = new boolean[]{false, false, false,false, true};
 
             @Override
             public Class getColumnClass(int columnIndex) {
@@ -159,7 +159,7 @@ public class AdminDashboard {
     private static Object[][] fetchDataFromDatabase() {
         Vector<Vector<Object>> dataVector = new Vector<>();
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "SELECT login, email, numero_tel FROM recuperation_mp";
+            String query = "SELECT login, email, numero_tel,code FROM recuperation_mp";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
@@ -167,6 +167,7 @@ public class AdminDashboard {
                     row.add(rs.getString("login"));
                     row.add(rs.getString("email"));
                     row.add(rs.getString("numero_tel"));
+                    row.add(rs.getInt("code"));
                     row.add(false);
                     dataVector.add(row);
                 }
