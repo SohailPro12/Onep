@@ -18,12 +18,12 @@ public class OnepProject {
         mainFrame.setLocationRelativeTo(null); // Center the window
         mainFrame.setResizable(false); // Disable resizing
         mainFrame.setLayout(new BorderLayout());
-
+        mainFrame.getContentPane().setBackground(Color.white);
         // Create a panel with CardLayout
         JPanel cardPanel = new JPanel(new CardLayout());
-
         // Create the main panel with buttons
         JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBackground(Color.white);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -53,6 +53,7 @@ public class OnepProject {
 
         // Header with Logo
         JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(Color.white);
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
         JLabel headerLabel = new JLabel("<html>Bienvenue chez <span style='color:#4682B4;'>CoordiTeam</span></html>", SwingConstants.CENTER);
         headerLabel.setFont(new Font("Arial", Font.BOLD, 25));
@@ -61,12 +62,12 @@ public class OnepProject {
         // Load and scale logo from the internet
         BufferedImage originalLogo = null;
         try {
-            URL url = new URL("https://fv5-2.failiem.lv/thumb_show.php?i=5pmjxwjabf&view&v=1");
+            URL url = new URL("https://i.pinimg.com/564x/5e/0c/63/5e0c63cd2afeff35ed8cb669819442c1.jpg");
                     originalLogo = ImageIO.read(url);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Image scaledLogo = originalLogo.getScaledInstance(350, 200, Image.SCALE_SMOOTH); // Scale the logo
+        Image scaledLogo = originalLogo.getScaledInstance(375, 200, Image.SCALE_SMOOTH); // Scale the logo
         ImageIcon logoIcon = new ImageIcon(scaledLogo);
         JLabel logoLabel = new JLabel(logoIcon);
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

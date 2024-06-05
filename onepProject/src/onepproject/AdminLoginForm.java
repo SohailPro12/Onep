@@ -19,6 +19,7 @@ public class AdminLoginForm {
         adminFrame.setLocationRelativeTo(null);
         adminFrame.setResizable(false); // Disable resizing
         adminFrame.setLayout(new GridBagLayout());
+        adminFrame.getContentPane().setBackground(Color.white);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(20, 20, 20, 20);
