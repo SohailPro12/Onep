@@ -28,18 +28,18 @@ public class AdminLoginForm {
         try {
             URL imageUrl = new URL("https://i.ibb.co/YXyW9Zt/Onep-svg.png");
             ImageIcon originalIcon = new ImageIcon(imageUrl);
-    
+
             // Get the width and height of the original image
             int originalWidth = originalIcon.getIconWidth();
             int originalHeight = originalIcon.getIconHeight();
-    
+
             // Calculate the width and height to fit the left part of the frame
             int targetWidth = 300; // Adjust this as needed
             int targetHeight = (int) Math.round((double) targetWidth / originalWidth * originalHeight);
-    
+
             // Resize the image to fit the target dimensions
             ImageIcon resizedIcon = new ImageIcon(originalIcon.getImage().getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT));
-    
+
             gbc.gridx = 0;
             gbc.gridy = 0;
             gbc.gridheight = GridBagConstraints.REMAINDER; // Span the entire height
@@ -118,11 +118,14 @@ public class AdminLoginForm {
                 String username = adminUsername.getText();
                 String password = new String(adminPassword.getPassword());
 
-                if (authenticateAdmin(username, password)) {
+                int authResult = authenticateAdmin(username, password);
+                if (authResult == 1) {
                     adminFrame.dispose();
                     AdminDashboard.showAdminDashboard(parentFrame);
+                } else if (authResult == 0) {
+                    messageLabel.setText("Invalid password.");
                 } else {
-                    messageLabel.setText("Invalid username or password.");
+                    messageLabel.setText("Invalid username.");
                 }
             }
         });
@@ -144,18 +147,27 @@ public class AdminLoginForm {
         });
     }
 
-    private static boolean authenticateAdmin(String username, String password) {
+    private static int authenticateAdmin(String username, String password) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "SELECT * FROM admin WHERE login = ? AND pass = ?";
+            // Ensure case-sensitive username check by using BINARY keyword
+            String query = "SELECT * FROM admin WHERE BINARY login = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, username);
-                stmt.setString(2, password);
                 ResultSet rs = stmt.executeQuery();
-                return rs.next();
+                if (rs.next()) {
+                    String storedPassword = rs.getString("pass");
+                    if (storedPassword.equals(password)) {
+                        return 1; // Authentication successful
+                    } else {
+                        return 0; // Invalid password
+                    }
+                } else {
+                    return -1; // Invalid username
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 

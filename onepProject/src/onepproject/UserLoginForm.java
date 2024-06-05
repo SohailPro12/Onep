@@ -101,12 +101,15 @@ public class UserLoginForm {
             public void actionPerformed(ActionEvent e) {
                 String username = userUsername.getText();
                 String password = new String(userPassword.getPassword());
-                if (authenticateUser(username, password)) {
-                    messageLabel.setText("Login successful!");
+                int authResult = authenticateUser(username, password);
+                if (authResult == 1) {
+                    JOptionPane.showMessageDialog(userFrame, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     userFrame.dispose();
                     showUserDashboard(username);
+                } else if (authResult == 0) {
+                    JOptionPane.showMessageDialog(userFrame, "Invalid password.", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    messageLabel.setText("Invalid username or password.");
+                    JOptionPane.showMessageDialog(userFrame, "Invalid username.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -132,7 +135,6 @@ public class UserLoginForm {
             }
         });
 
-
         userFrame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -141,20 +143,27 @@ public class UserLoginForm {
         });
     }
 
-    private static boolean authenticateUser(String username, String password) {
+    private static int authenticateUser(String username, String password) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "SELECT * FROM Agent WHERE login = ? AND pass = ? UNION SELECT * FROM superieur WHERE login = ? AND pass = ?";
+            String query = "SELECT * FROM Agent WHERE BINARY login = ? UNION SELECT * FROM superieur WHERE BINARY login = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, username);
-                stmt.setString(2, password);
-                stmt.setString(3, username);
-                stmt.setString(4, password);
+                stmt.setString(2, username);
                 ResultSet rs = stmt.executeQuery();
-                return rs.next();
+                if (rs.next()) {
+                    String storedPassword = rs.getString("pass");
+                    if (storedPassword.equals(password)) {
+                        return 1; // Authentication successful
+                    } else {
+                        return 0; // Invalid password
+                    }
+                } else {
+                    return -1; // Invalid username
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 
@@ -250,18 +259,22 @@ public class UserLoginForm {
                 String username = usernameField.getText();
                 String email = emailField.getText();
                 String phone = phoneField.getText();
-                if (submitPasswordRecoveryRequest(username, email, phone)) {
-                    messageLabel.setText("Recovery request submitted.");
+                boolean userExists = checkUserDetails(username, email, phone);
+                if (userExists) {
+                    JOptionPane.showMessageDialog(forgotPasswordFrame, "User details validated. Proceed to reset password.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    messageLabel.setText("Proceed to reset password.");
+                    // Logic to allow password reset can be added here
                 } else {
-                    messageLabel.setText("Invalid username, email, or phone number.");
+                    JOptionPane.showMessageDialog(forgotPasswordFrame, "Invalid details. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                    messageLabel.setText("Invalid details. Please try again.");
                 }
             }
         });
 
         proceedButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                forgotPasswordFrame.dispose();
-                showRecoveryCodeForm(parentFrame);
+                // Logic to proceed with password reset
+                JOptionPane.showMessageDialog(forgotPasswordFrame, "Password reset functionality is not implemented yet.", "Info", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -273,102 +286,19 @@ public class UserLoginForm {
         });
     }
 
-    private static boolean submitPasswordRecoveryRequest(String username, String email, String phone) {
+    private static boolean checkUserDetails(String username, String email, String phone) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "INSERT INTO recuperation_mp (login, email, numero_tel, code) VALUES (?, ?, ?, ?)";
+            String query = "SELECT * FROM Agent WHERE login = ? AND email = ? AND telephone = ? " +
+                           "UNION SELECT * FROM superieur WHERE login = ? AND email = ? AND telephone = ?";
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, username);
                 stmt.setString(2, email);
                 stmt.setString(3, phone);
-                stmt.setString(4, generateRecoveryCode());
-                int affectedRows = stmt.executeUpdate();
-                return affectedRows > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private static String generateRecoveryCode() {
-        // Generate a random recovery code
-        return String.valueOf((int) (Math.random() * 9000) + 1000);
-    }
-
-    private static void showRecoveryCodeForm(JFrame parentFrame) {
-        JFrame recoveryCodeFrame = new JFrame("Enter Recovery Code");
-        recoveryCodeFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        recoveryCodeFrame.setSize(400, 300);
-        recoveryCodeFrame.setLocationRelativeTo(null);
-        recoveryCodeFrame.setResizable(false); // Disable resizing
-        recoveryCodeFrame.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        recoveryCodeFrame.add(new JLabel("Username:"), gbc);
-
-        gbc.gridx = 1;
-        JTextField usernameField = new JTextField(20);
-        usernameField.setFont(new Font("Arial", Font.PLAIN, 18));
-        recoveryCodeFrame.add(usernameField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        recoveryCodeFrame.add(new JLabel("Recovery Code:"), gbc);
-
-        gbc.gridx = 1;
-        JTextField codeField = new JTextField(20);
-        codeField.setFont(new Font("Arial", Font.PLAIN, 18));
-        recoveryCodeFrame.add(codeField, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        JButton verifyButton = new JButton("Verify");
-        styleButton(verifyButton);
-        recoveryCodeFrame.add(verifyButton, gbc);
-
-        JLabel messageLabel = new JLabel("");
-        messageLabel.setForeground(Color.RED);
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        recoveryCodeFrame.add(messageLabel, gbc);
-
-        recoveryCodeFrame.setVisible(true);
-
-        verifyButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String code = codeField.getText();
-                if (verifyRecoveryCode(username, code)) {
-                    messageLabel.setText("Code verified. You may now reset your password.");
-                    showResetPasswordForm(parentFrame, username);
-                    recoveryCodeFrame.dispose();
-                } else {
-                    messageLabel.setText("Invalid username or recovery code.");
-                }
-            }
-        });
-
-        recoveryCodeFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                parentFrame.setVisible(true);
-            }
-        });
-    }
-
-    private static boolean verifyRecoveryCode(String username, String code) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "SELECT * FROM recuperation_mp WHERE login = ? AND code = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, username);
-                stmt.setString(2, code);
+                stmt.setString(4, username);
+                stmt.setString(5, email);
+                stmt.setString(6, phone);
                 ResultSet rs = stmt.executeQuery();
-                return rs.next();
+                return rs.next(); // True if user exists, false otherwise
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -376,113 +306,7 @@ public class UserLoginForm {
         }
     }
 
-    private static void showResetPasswordForm(JFrame parentFrame, String username) {
-        JFrame resetPasswordFrame = new JFrame("Reset Password");
-        resetPasswordFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        resetPasswordFrame.setSize(400, 300);
-        resetPasswordFrame.setLocationRelativeTo(null);
-        resetPasswordFrame.setResizable(false); // Disable resizing
-        resetPasswordFrame.setLayout(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        resetPasswordFrame.add(new JLabel("New Password:"), gbc);
-
-        gbc.gridx = 1;
-        JPasswordField newPasswordField = new JPasswordField(20);
-        newPasswordField.setFont(new Font("Arial", Font.PLAIN, 18));
-        resetPasswordFrame.add(newPasswordField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        resetPasswordFrame.add(new JLabel("Confirm Password:"), gbc);
-
-        gbc.gridx = 1;
-        JPasswordField confirmPasswordField = new JPasswordField(20);
-        confirmPasswordField.setFont(new Font("Arial", Font.PLAIN, 18));
-        resetPasswordFrame.add(confirmPasswordField, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        JButton resetPasswordButton = new JButton("Reset Password");
-        styleButton(resetPasswordButton);
-        resetPasswordFrame.add(resetPasswordButton, gbc);
-
-        JLabel messageLabel = new JLabel("");
-        messageLabel.setForeground(Color.RED);
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        resetPasswordFrame.add(messageLabel, gbc);
-
-        resetPasswordFrame.setVisible(true);
-
-        resetPasswordButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String newPassword = new String(newPasswordField.getPassword());
-                String confirmPassword = new String(confirmPasswordField.getPassword());
-                if (newPassword.equals(confirmPassword)) {
-                    System.out.println(username+" "+newPassword);
-                    if (resetUserPassword(username, newPassword)) {
-                        messageLabel.setForeground(Color.GREEN);
-                        messageLabel.setText("Password reset successfully.");
-                        resetPasswordFrame.dispose();
-                        parentFrame.setVisible(true);
-                    } else {
-                        messageLabel.setText("Error resetting password. Please try again.");
-                    }
-                } else {
-                    messageLabel.setText("Passwords do not match.");
-                }
-            }
-        });
-
-        resetPasswordFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                parentFrame.setVisible(true);
-            }
-        });
-    }
-
-    private static boolean resetUserPassword(String username, String newPassword) {    
-         String role = getUserRole(username);
-        if (role.equals("superieur")) {
-            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "UPDATE superieur SET pass = ? WHERE login = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, newPassword);
-                stmt.setString(2, username);
-                int affectedRows = stmt.executeUpdate();
-                return affectedRows > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-        } else if (role.equals("agent")) {
-            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "UPDATE Agent SET pass = ? WHERE login = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, newPassword);
-                stmt.setString(2, username);
-                int affectedRows = stmt.executeUpdate();
-                return affectedRows > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-        } else {
-            JOptionPane.showMessageDialog(null, "Problem happen");
-            return false;
-        }
-    }
-
-    private static void styleButton(JButton button) {
+     private static void styleButton(JButton button) {
         button.setFont(new Font("Arial", Font.BOLD, 16));
         button.setBackground(new Color(70, 130, 180));
         button.setForeground(Color.WHITE);
