@@ -97,6 +97,31 @@ public class AdminDashboard {
         logoutButton.setFocusPainted(false);
         createAccountButton.setFocusPainted(false);
         doneButton.setFocusPainted(false);
+JButton deleteUserButton = new JButton("Supprimer Compte Utilisateur");
+deleteUserButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+deleteUserButton.setBackground(new Color(70, 130, 180));
+deleteUserButton.setForeground(Color.WHITE);
+deleteUserButton.setFocusPainted(false);
+
+deleteUserButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String login = JOptionPane.showInputDialog(adminDashboardFrame, "Entrez le login de l'utilisateur à supprimer:", "Supprimer Compte Utilisateur", JOptionPane.PLAIN_MESSAGE);
+        if (login != null && !login.trim().isEmpty()) {
+            int confirmation = JOptionPane.showConfirmDialog(adminDashboardFrame, "Êtes-vous sûr de vouloir supprimer l'utilisateur avec le login: " + login + " ?", "Confirmation de suppression", JOptionPane.YES_NO_OPTION);
+            if (confirmation == JOptionPane.YES_OPTION) {
+                if (deleteUserAccountFromDatabase(login)) {
+                    JOptionPane.showMessageDialog(adminDashboardFrame, "Compte utilisateur supprimé avec succès.");
+                } else {
+                    JOptionPane.showMessageDialog(adminDashboardFrame, "Impossible de supprimer le compte utilisateur de la base de données.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(adminDashboardFrame, "Le login ne peut pas être vide.");
+        }
+    }
+});
+buttonPanel.add(deleteUserButton);
 
         logoutButton.addActionListener(new ActionListener() {
             @Override
@@ -198,4 +223,46 @@ public class AdminDashboard {
             return false;
         }
     }
+    
+    private static boolean deleteUserAccountFromDatabase(String login) {
+    try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+        String role = getUserRole(login);
+        if (role.equals("superieur")){
+        String query = "DELETE FROM superieur WHERE login = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, login);
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+        }}else if (role.equals("agent")){
+        String query = "DELETE FROM Agent WHERE login = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, login);
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+        }}
+        return true;
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Erreur lors de la suppression du compte utilisateur: " + e.getMessage(), "Erreur de base de données", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+        return false;
+    }
+}
+    
+     private static String getUserRole(String username) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "SELECT 'superieur' AS role FROM superieur WHERE login = ? UNION SELECT 'agent' AS role FROM Agent WHERE login = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                stmt.setString(2, username);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getString("role");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
 }
