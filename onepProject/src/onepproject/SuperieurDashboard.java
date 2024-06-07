@@ -79,7 +79,7 @@ public class SuperieurDashboard {
 
         gbc.gridx = 0;
         gbc.gridy = 4;
-        topPanel.add(new JLabel("Département:"), gbc);
+        topPanel.add(new JLabel("Service:"), gbc);
 
         gbc.gridx = 1;
         JComboBox<String> departmentComboBox = new JComboBox<>();

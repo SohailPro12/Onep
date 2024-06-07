@@ -19,8 +19,10 @@ public class OnepProject {
         mainFrame.setResizable(false); // Disable resizing
         mainFrame.setLayout(new BorderLayout());
         mainFrame.getContentPane().setBackground(Color.white);
+
         // Create a panel with CardLayout
         JPanel cardPanel = new JPanel(new CardLayout());
+
         // Create the main panel with buttons
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(Color.white);
@@ -53,9 +55,12 @@ public class OnepProject {
 
         // Header with Logo
         JPanel headerPanel = new JPanel();
-         gbc.gridy = 1;
         headerPanel.setBackground(Color.white);
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        
+        // Center-align components in the header panel
+        headerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         JLabel headerLabel = new JLabel("<html>Bienvenue chez <span style='color:#4682B4;'>CoordiTeam</span></html>", SwingConstants.CENTER);
         headerLabel.setFont(new Font("Arial", Font.BOLD, 25));
         headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -64,11 +69,11 @@ public class OnepProject {
         BufferedImage originalLogo = null;
         try {
             URL url = new URL("http://www.onep.ma/news/2017/semaine-eau_25-09-2017/Logo-ONEE.jpg");
-                    originalLogo = ImageIO.read(url);
+            originalLogo = ImageIO.read(url);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Image scaledLogo = originalLogo.getScaledInstance(500,  100, Image.SCALE_SMOOTH); // Scale the logo
+        Image scaledLogo = originalLogo.getScaledInstance(400, 100, Image.SCALE_SMOOTH); // Scale the logo
         ImageIcon logoIcon = new ImageIcon(scaledLogo);
         JLabel logoLabel = new JLabel(logoIcon);
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -53,10 +53,10 @@ public class CreateAccountForm extends JDialog {
         addLabel(formPanel, gbc, "Poste:", 0, 3, textColor);
         positionField = createTextField(formPanel, gbc, 1, 3, "Enter your position");
 
-        addLabel(formPanel, gbc, "Département:", 0, 4, textColor);
+        addLabel(formPanel, gbc, "Service:", 0, 4, textColor);
         departmentComboBox = new JComboBox<>();
         populateDepartmentComboBox();
-        departmentComboBox.setToolTipText("Select your department");
+        departmentComboBox.setToolTipText("Select your Servicet");
         departmentComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
         departmentComboBox.setBorder(new LineBorder(Color.GRAY));
         gbc.gridx = 1;
@@ -109,7 +109,7 @@ public class CreateAccountForm extends JDialog {
                     // Display entered data in a dialog
                     JOptionPane.showMessageDialog(CreateAccountForm.this,
                             "Num user: " + login + "\nMot de passe: " + password + "\nNom complet: " + fullName +
-                                    "\nPoste: " + position + "\nDépartement: " + department + "\nEmail: " + email + "\nNuméro de téléphone: " + phone + "\nCompte: " + role,
+                                    "\nPoste: " + position + "\nService: " + department + "\nEmail: " + email + "\nNuméro de téléphone: " + phone + "\nCompte: " + role,
                             "Compte créé", JOptionPane.INFORMATION_MESSAGE);
 
                     // Insert data into the database
