@@ -53,6 +53,7 @@ public class OnepProject {
 
         // Header with Logo
         JPanel headerPanel = new JPanel();
+         gbc.gridy = 1;
         headerPanel.setBackground(Color.white);
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
         JLabel headerLabel = new JLabel("<html>Bienvenue chez <span style='color:#4682B4;'>CoordiTeam</span></html>", SwingConstants.CENTER);
@@ -62,12 +63,12 @@ public class OnepProject {
         // Load and scale logo from the internet
         BufferedImage originalLogo = null;
         try {
-            URL url = new URL("https://i.pinimg.com/564x/5e/0c/63/5e0c63cd2afeff35ed8cb669819442c1.jpg");
+            URL url = new URL("http://www.onep.ma/news/2017/semaine-eau_25-09-2017/Logo-ONEE.jpg");
                     originalLogo = ImageIO.read(url);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Image scaledLogo = originalLogo.getScaledInstance(375, 200, Image.SCALE_SMOOTH); // Scale the logo
+        Image scaledLogo = originalLogo.getScaledInstance(500,  100, Image.SCALE_SMOOTH); // Scale the logo
         ImageIcon logoIcon = new ImageIcon(scaledLogo);
         JLabel logoLabel = new JLabel(logoIcon);
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
