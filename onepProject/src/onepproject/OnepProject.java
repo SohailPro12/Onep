@@ -54,34 +54,57 @@ public class OnepProject {
         mainPanel.add(userButton, gbc);
 
         // Header with Logo
-        JPanel headerPanel = new JPanel();
+        JPanel headerPanel = new JPanel(new GridBagLayout());
         headerPanel.setBackground(Color.white);
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        
-        // Center-align components in the header panel
-        headerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel headerLabel = new JLabel("<html>Bienvenue chez <span style='color:#4682B4;'>CoordiTeam</span></html>", SwingConstants.CENTER);
-        headerLabel.setFont(new Font("Arial", Font.BOLD, 25));
-        headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Load and scale logo from the internet
-        BufferedImage originalLogo = null;
+        // Load and scale main logo from the internet
+        BufferedImage mainLogo = null;
         try {
-            URL url = new URL("http://www.onep.ma/news/2017/semaine-eau_25-09-2017/Logo-ONEE.jpg");
-            originalLogo = ImageIO.read(url);
+            URL mainLogoUrl = new URL("http://www.onep.ma/news/2017/semaine-eau_25-09-2017/Logo-ONEE.jpg");
+            mainLogo = ImageIO.read(mainLogoUrl);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Image scaledLogo = originalLogo.getScaledInstance(400, 100, Image.SCALE_SMOOTH); // Scale the logo
-        ImageIcon logoIcon = new ImageIcon(scaledLogo);
-        JLabel logoLabel = new JLabel(logoIcon);
-        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        Image scaledMainLogo = mainLogo.getScaledInstance(500, 100, Image.SCALE_SMOOTH); // Scale the main logo
+        ImageIcon mainLogoIcon = new ImageIcon(scaledMainLogo);
+        JLabel mainLogoLabel = new JLabel(mainLogoIcon);
 
-        headerPanel.add(logoLabel);
-        headerPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacing between logo and text
-        headerPanel.add(headerLabel);
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        // Load and scale app logo from the internet
+        BufferedImage appLogo = null;
+        try {
+            URL appLogoUrl = new URL("https://i.ibb.co/PZjxwDy/large-removebg-preview.png");
+            appLogo = ImageIO.read(appLogoUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Image scaledAppLogo = appLogo.getScaledInstance(200, 200, Image.SCALE_SMOOTH); // Scale the app logo
+        ImageIcon appLogoIcon = new ImageIcon(scaledAppLogo);
+        JLabel appLogoLabel = new JLabel(appLogoIcon);
+
+        // Create a panel to hold both logos side by side
+        JPanel logosPanel = new JPanel();
+        logosPanel.setBackground(Color.white);
+        logosPanel.add(mainLogoLabel);
+        logosPanel.add(Box.createRigidArea(new Dimension(20, 0))); // Space between logos
+        logosPanel.add(appLogoLabel);
+
+        // Add logos panel to header panel
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        headerPanel.add(logosPanel, gbc);
+
+        // Header label
+        JLabel headerLabel = new JLabel("<html>Bienvenue chez <span style='color:#4682B4;'>CoordiTeam</span></html>", SwingConstants.CENTER);
+        headerLabel.setFont(new Font("Arial", Font.BOLD, 25));
+
+        // Add header label to header panel
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        headerPanel.add(headerLabel, gbc);
 
         // Footer
         JLabel footerLabel = new JLabel("© 2024 Onep Project Inc.", SwingConstants.CENTER);
