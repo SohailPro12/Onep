@@ -1,10 +1,6 @@
-Sure, here's the full README for the OneP Project:
-
----
-
 # OneP Project
 
-OneP Project is a Java application designed to manage user authentication and task management for a hypothetical organization. It includes features such as user login, password recovery, and task assignment.
+OneP Project is a Java application designed to manage user authentication and task management for a onep organization. It includes features such as user login, password recovery, and task assignment.
 
 ## Features
 
