@@ -1,30 +1,30 @@
 # OneP Project
 
-OneP Project is a Java application designed to manage user authentication and task management for a onep organization. It includes features such as user login, password recovery, and task assignment.
+OneP Project est une application Java conçue pour la gestion des tâches pour l'ONEP(office national d'eau et électricité potable) au Maroc. Il comprend des fonctionnalités telles que la connexion utilisateur, la récupération de mot de passe et l’affectation des tâches.
 
-## Features
+## Caractéristiques
 
-- **User Authentication**: Users can log in using their username and password. Different types of users, such as agents and superiors, have access to different functionalities based on their roles.
-- **Password Recovery**: Users can recover their passwords by providing their username, email, and phone number. A recovery code is generated and sent to the user to reset their password.
-- **Task Management**: Superiors can assign tasks to agents and monitor their progress. Agents can view assigned tasks and update their status.
+- **Authentification de l’utilisateur** : L’utilisateur peut se connecter en utilisant son nom d’utilisateur et son mot de passe. Différents types d’utilisateurs, tels que les agents et les supérieurs, ont accès à différentes fonctionnalités en fonction de leurs rôles.
+- **Password Recovery** : Les utilisateurs peuvent récupérer leurs mots de passe en fournissant leur nom d’utilisateur, leur adresse courriel et leur numéro de téléphone. Un code de récupération est généré et envoyé à l’utilisateur pour réinitialiser son mot de passe.
+- **Gestion des tâches** : les supérieurs peuvent assigner des tâches aux agents et surveiller leur progression. Les agents peuvent voir les tâches assignées et mettre à jour leur statut.
 
-## Requirements
+# Exigences
 
-- Java Development Kit (JDK) 8 or higher
-- MySQL Database Server
-- JDBC Driver for MySQL
+- Java Development Kit (JDK) 8 ou supérieur
+- Serveur de base de données MySQL
+- Pilote JDBC pour MySQL
 
 ## Installation
 
-1. Clone the repository:
+1. Cloner le dépôt :
 
    ```bash
    git clone https://github.com/your_username/onep-project.git
    ```
 
-2. Configure the database connection details.
+2. Configurer les détails de connexion à la base de données.
 
-Here's the full SQL code for creating the database and tables for the OneP Project:
+Voici le code SQL complet pour créer la base de données et les tableaux du projet OneP :
 
 ```sql
 -- MySQL database creation script
@@ -105,27 +105,27 @@ CREATE TABLE IF NOT EXISTS `tache` (
 
 ```
 
-3. Import the project into your preferred Java IDE.
+3. Importez le projet dans votre EDI Java préféré.
 
-4. Run the application.
+4. Exécuter l’application.
 
-## Usage
+## Utilisation
 
-1. Launch the application.
+1. Lancer l’application.
 
-2. Log in using your username and password.
+2. Connectez-vous en utilisant votre nom d’utilisateur et mot de passe.
 
-3. Navigate through the application to access different features based on your role.
+3. Naviguez dans l’application pour accéder à différentes fonctions en fonction de votre rôle.
 
-## Internship Information
+## Renseignements sur le stage
 
-This project is part of an internship at OneP in Al Hoceima, Morocco.
+Ce projet fait partie d’un stage chez OneP à Al Hoceima, au Maroc.
 
-## Our Supervisor
+## Notre superviseur
 
 - [Ahmed Akkar](https://github.com/Ahmed-Akkar)
 
-## Contributors
+## Contributeurs
 
 - [Sohail Charef](https://github.com/SohailPro12)
 - [Ahmed Azagaz](https://github.com/ahmedazagaz)
